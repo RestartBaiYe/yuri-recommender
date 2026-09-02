@@ -419,29 +419,6 @@
     "verdict": "运动+百合的青春物语，感染力强。"
   },
   {
-    "id": "denki-gai",
-    "title": "电器街的漫画店",
-    "en": "Denkigai no Honya-san",
-    "year": 2014,
-    "studio": "Brain's Base",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "职场",
-      "搞笑",
-      "二次元"
-    ],
-    "score": [
-      6,
-      7,
-      6,
-      6,
-      5
-    ],
-    "summary": "漫画店员们的日常，各种腐宅梗与少女们的小心思。",
-    "verdict": "搞笑向轻百合，看个乐子很合适。"
-  },
-  {
     "id": "inugami-sisters",
     "title": "犬神同学和猫山同学",
     "en": "Inugami-san to Nekoyama-san",
@@ -463,29 +440,6 @@
     ],
     "summary": "犬系与猫系少女的冤家日常，每集五分钟的糖分炸弹。",
     "verdict": "浓度极高的小品作，适合碎片时间。"
-  },
-  {
-    "id": "ao-kanata",
-    "title": "苍之彼方的四重奏",
-    "en": "Aokana",
-    "year": 2016,
-    "studio": "GONZO",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "运动",
-      "天空",
-      "恋爱"
-    ],
-    "score": [
-      6,
-      6,
-      7,
-      3,
-      5
-    ],
-    "summary": "天空竞技（飞行棋）题材，主线是男主与多女主。",
-    "verdict": "严格说不是百合，但女配线有百合味。"
   },
   {
     "id": "kanamemo",
@@ -900,29 +854,6 @@
     "verdict": "追星文化刻画真实，浓度高且动人。"
   },
   {
-    "id": "aku-no-jo",
-    "title": "魔女之旅",
-    "en": "Majo no Tabitabi",
-    "year": 2020,
-    "studio": "C2C",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "旅行",
-      "奇幻",
-      "单元"
-    ],
-    "score": [
-      7,
-      7,
-      8,
-      3,
-      7
-    ],
-    "summary": "魔女伊蕾娜的旅行见闻，单元剧为主。",
-    "verdict": "百合浓度低，但世界观很美。"
-  },
-  {
     "id": "watashi-yuri",
     "title": "百乃工 / 百合是我的工作！",
     "en": "Watashi no Yuri wa Oshigoto desu!",
@@ -1079,29 +1010,6 @@
     ],
     "summary": "黑暗魔法少女，女主与伙伴们的羁绊。",
     "verdict": "致郁向，百合是暗线。"
-  },
-  {
-    "id": "aria",
-    "title": "水星领航员",
-    "en": "Aria",
-    "year": 2005,
-    "studio": "HALFILM",
-    "eps": 52,
-    "type": "TV",
-    "tags": [
-      "治愈",
-      "经典",
-      "日常"
-    ],
-    "score": [
-      9,
-      8,
-      9,
-      3,
-      7
-    ],
-    "summary": "火星威尼斯的水之都，领航员少女们的日常。",
-    "verdict": "不是百合但治愈到灵魂，值得一看。"
   },
   {
     "id": "hidamari",
@@ -1600,29 +1508,6 @@
     ],
     "summary": "狐娘们在温泉旅馆「此花亭」的温馨日常。",
     "verdict": "和风治愈，百合浓度不低。"
-  },
-  {
-    "id": "sora-yori",
-    "title": "比宇宙更远的地方",
-    "en": "Sora yori mo Tooi Basho",
-    "year": 2018,
-    "studio": "MADHOUSE",
-    "eps": 13,
-    "type": "TV",
-    "tags": [
-      "南极",
-      "青春",
-      "友情"
-    ],
-    "score": [
-      9,
-      9,
-      8,
-      4,
-      8
-    ],
-    "summary": "四位少女的南极之旅，友情浓度拉满。",
-    "verdict": "不是百合但女性羁绊极动人。"
   },
   {
     "id": "kobayashi",
@@ -2378,29 +2263,6 @@
     "verdict": "体育系轻百合，热血与甜并存。"
   },
   {
-    "id": "wonder-egg",
-    "title": "奇蛋物语",
-    "en": "Wonder Egg Priority",
-    "year": 2021,
-    "studio": "CloverWorks",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "致郁",
-      "心理",
-      "原创"
-    ],
-    "score": [
-      8,
-      8,
-      8,
-      6,
-      7
-    ],
-    "summary": "少女们在梦中与「怪童」战斗，赎罪与自我救赎。AI少女与主角的羁绊。",
-    "verdict": "画面精美、议题大胆，百合是暗线但动人。"
-  },
-  {
     "id": "neighbor-vampire",
     "title": "邻家的吸血鬼小妹",
     "en": "Tonari no Kyuuketsuki-san",
@@ -2560,28 +2422,6 @@
     "verdict": "魔法少女轻百合。"
   },
   {
-    "id": "chio-chan",
-    "title": "千绪的通学路",
-    "en": "Chio-chan no Tsuugakuro",
-    "year": 2018,
-    "studio": "Diomedea",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "搞笑",
-      "校园"
-    ],
-    "score": [
-      6,
-      6,
-      7,
-      4,
-      5
-    ],
-    "summary": "普通女高中生的脑洞上学路。",
-    "verdict": "搞笑向，轻百合点缀。"
-  },
-  {
     "id": "joshiraku",
     "title": "女子落语",
     "en": "Joshiraku",
@@ -2602,29 +2442,6 @@
     ],
     "summary": "落语少女们的后台闲聊。",
     "verdict": "电波系搞笑，百合味清淡。"
-  },
-  {
-    "id": "mitsuboshi",
-    "title": "三颗星彩色冒险",
-    "en": "Mitsuboshi Colors",
-    "year": 2018,
-    "studio": "SILVER LINK",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "日常",
-      "幼女",
-      "治愈"
-    ],
-    "score": [
-      7,
-      6,
-      7,
-      4,
-      5
-    ],
-    "summary": "小学女生三人组的城市冒险。",
-    "verdict": "清新治愈。"
   },
   {
     "id": "tamayura",
@@ -2671,28 +2488,6 @@
     ],
     "summary": "舞台少女们追逐「世界大明星」的称号，心菜的执念。",
     "verdict": "舞台百合新作，心菜与静的羁绊很香。"
-  },
-  {
-    "id": "jinrui",
-    "title": "人类衰退之后",
-    "en": "Jinrui wa Suitai Shimashita",
-    "year": 2012,
-    "studio": "AIC A.S.T.A.",
-    "eps": 13,
-    "type": "TV",
-    "tags": [
-      "黑色幽默",
-      "科幻"
-    ],
-    "score": [
-      8,
-      7,
-      7,
-      3,
-      5
-    ],
-    "summary": "人类衰退后的世界，妖精与人类小姐的日常。",
-    "verdict": "电波治愈番。"
   },
   {
     "id": "non-non-biyori",
@@ -2830,28 +2625,6 @@
     "verdict": "肉番向百合。"
   },
   {
-    "id": "gakuen-alice",
-    "title": "学园爱丽丝",
-    "en": "Gakuen Alice",
-    "year": 2004,
-    "studio": "Group Tac",
-    "eps": 26,
-    "type": "TV",
-    "tags": [
-      "学园",
-      "能力"
-    ],
-    "score": [
-      7,
-      7,
-      7,
-      5,
-      5
-    ],
-    "summary": "拥有特殊能力的孩子们在学园，蜜柑与枣。",
-    "verdict": "童年番，百合线清淡。"
-  },
-  {
     "id": "lovelive",
     "title": "LoveLive!",
     "en": "Love Live!",
@@ -2917,49 +2690,6 @@
     ],
     "summary": "结丘女学院的五名成员。",
     "verdict": "结丘女学院的新篇章，澪与香音的羁绊动人。"
-  },
-  {
-    "id": "idoly-pride",
-    "title": "偶像荣耀",
-    "en": "Idoly Pride",
-    "year": 2021,
-    "studio": "Lerche",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "偶像",
-      "音乐"
-    ],
-    "score": [
-      7,
-      7,
-      8,
-      5,
-      5
-    ],
-    "summary": "偶像经纪公司与少女们的梦想。",
-    "verdict": "音乐与偶像题材，轻百合氛围。"
-  },
-  {
-    "id": "idolmaster",
-    "title": "偶像大师",
-    "en": "THE IDOLM@STER",
-    "year": 2011,
-    "studio": "A-1 Pictures",
-    "eps": 25,
-    "type": "TV",
-    "tags": [
-      "偶像"
-    ],
-    "score": [
-      7,
-      7,
-      8,
-      4,
-      7
-    ],
-    "summary": "765事务所的偶像们。",
-    "verdict": "偶像番经典，轻百合点缀。"
   },
   {
     "id": "aikatsu",
@@ -3184,50 +2914,6 @@
     "verdict": "经典轻百合，电波对得上就是神作。"
   },
   {
-    "id": "nichijou",
-    "title": "日常",
-    "en": "Nichijou",
-    "year": 2011,
-    "studio": "京都动画",
-    "eps": 26,
-    "type": "TV",
-    "tags": [
-      "日常",
-      "搞笑"
-    ],
-    "score": [
-      8,
-      7,
-      8,
-      4,
-      7
-    ],
-    "summary": "女高中生与机器人少女的日常。",
-    "verdict": "京阿尼搞笑巅峰。"
-  },
-  {
-    "id": "mikakunin",
-    "title": "未确认进行式",
-    "en": "Mikakunin de Shinkoukei",
-    "year": 2014,
-    "studio": "動画工房",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "日常",
-      "未婚妻"
-    ],
-    "score": [
-      6,
-      6,
-      7,
-      5,
-      5
-    ],
-    "summary": "小红的未婚夫竟然是白丝少女？",
-    "verdict": "轻百合日常。"
-  },
-  {
     "id": "sabagebu",
     "title": "生存游戏社",
     "en": "Sabagebu!",
@@ -3315,50 +3001,6 @@
     ],
     "summary": "堕天使加百列的宅日常。",
     "verdict": "搞笑轻百合。"
-  },
-  {
-    "id": "aho-girl",
-    "title": "笨女孩",
-    "en": "Aho Girl",
-    "year": 2017,
-    "studio": "Diomedea",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "搞笑",
-      "日常"
-    ],
-    "score": [
-      5,
-      5,
-      6,
-      3,
-      5
-    ],
-    "summary": "笨蛋花畑佳子的日常。",
-    "verdict": "搞笑番，轻百合点缀。"
-  },
-  {
-    "id": "working",
-    "title": "迷糊餐厅",
-    "en": "Working!!",
-    "year": 2010,
-    "studio": "A-1 Pictures",
-    "eps": 39,
-    "type": "TV",
-    "tags": [
-      "职场",
-      "搞笑"
-    ],
-    "score": [
-      7,
-      7,
-      7,
-      4,
-      6
-    ],
-    "summary": "家庭餐厅的店员们，小鸟游与伊波。",
-    "verdict": "职场轻喜剧，百合线清淡。"
   },
   {
     "id": "yuki-yuna",
@@ -3801,28 +3443,6 @@
     "verdict": "细腻的慢热百合，可惜只有一季。"
   },
   {
-    "id": "girlish-number",
-    "title": "少女编号",
-    "en": "Gi(a)rlish Number",
-    "year": 2016,
-    "studio": "Diomedea",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "声优",
-      "职场"
-    ],
-    "score": [
-      7,
-      7,
-      7,
-      3,
-      5
-    ],
-    "summary": "新人声优千岁的职场日常，略带毒舌的吐槽。",
-    "verdict": "声优业界吐槽番，轻百合点缀。"
-  },
-  {
     "id": "rolling-girls",
     "title": "旋转少女",
     "en": "Rolling Girls",
@@ -4155,29 +3775,6 @@
     "verdict": "冷门百合经典，结局令人扼腕。"
   },
   {
-    "id": "otome-wa-boku",
-    "title": "少女爱上姐姐",
-    "en": "Otome wa Boku ni Koishiteru",
-    "year": 2006,
-    "studio": "feel.",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "女装",
-      "学院",
-      "搞笑"
-    ],
-    "score": [
-      6,
-      6,
-      7,
-      7,
-      5
-    ],
-    "summary": "男装丽人（实为男性）进入女学园，被大小姐们包围。",
-    "verdict": "伪娘百合的经典，欢乐向。"
-  },
-  {
     "id": "love-lab",
     "title": "恋爱研究所",
     "en": "Love Lab",
@@ -4199,29 +3796,6 @@
     ],
     "summary": "贵族女校学生会的高强度恋爱研究，真木与小鹿的互动。",
     "verdict": "轻百合搞笑番，动工出品。"
-  },
-  {
-    "id": "luluco",
-    "title": "宇宙巡警露露子",
-    "en": "Space Patrol Luluco",
-    "year": 2016,
-    "studio": "Trigger",
-    "eps": 13,
-    "type": "TV",
-    "tags": [
-      "搞笑",
-      "短片",
-      "宇宙"
-    ],
-    "score": [
-      7,
-      7,
-      8,
-      6,
-      5
-    ],
-    "summary": "宇宙巡警少女露露子的打工日常，电波节奏。",
-    "verdict": "Trigger短片，轻松有趣。"
   },
   {
     "id": "stella-no-mahou",
@@ -4336,29 +3910,6 @@
     ],
     "summary": "最讨厌的同班女生，竟然是最想靠近的人。2025年新番。",
     "verdict": "直球校园百合，人气新作。"
-  },
-  {
-    "id": "princess-connect",
-    "title": "公主连结Re:Dive",
-    "en": "Princess Connect Re:Dive",
-    "year": 2020,
-    "studio": "CygamesPictures",
-    "eps": 13,
-    "type": "TV",
-    "tags": [
-      "游戏",
-      "搞笑",
-      "日常"
-    ],
-    "score": [
-      6,
-      6,
-      7,
-      5,
-      6
-    ],
-    "summary": "失忆主角与少女们的冒险日常，可可萝的浓度。",
-    "verdict": "游戏衍生，轻百合氛围。"
   },
   {
     "id": "machikado-2",
@@ -4563,29 +4114,6 @@
     "verdict": "轻松甜蜜的恋爱轻百合。"
   },
   {
-    "id": "25-dimension",
-    "title": "2.5次元的诱惑",
-    "en": "2.5-jigen no Ririsa",
-    "year": 2024,
-    "studio": "J.C.STAFF",
-    "eps": 24,
-    "type": "TV",
-    "tags": [
-      "cosplay",
-      "社团",
-      "恋爱"
-    ],
-    "score": [
-      7,
-      7,
-      8,
-      6,
-      7
-    ],
-    "summary": "cosplay社团的少少女们，喜丽亚与奥姆的二次元物语。",
-    "verdict": "cosplay题材新鲜，轻百合氛围不错。"
-  },
-  {
     "id": "vtuber-legend",
     "title": "VTuber传奇",
     "en": "VTuber Legend",
@@ -4628,73 +4156,5 @@
     ],
     "summary": "依与木乃香的大银幕延续。",
     "verdict": "TV的延续，直球乐队百合剧场版。"
-  },
-  {
-    "id": "dungeon-meshi",
-    "title": "迷宫饭",
-    "en": "Dungeon Meshi",
-    "year": 2024,
-    "studio": "Trigger",
-    "eps": 24,
-    "type": "TV",
-    "tags": [
-      "奇幻",
-      "美食",
-      "冒险"
-    ],
-    "score": [
-      9,
-      9,
-      9,
-      4,
-      9
-    ],
-    "summary": "迷宫探索+美食的神作，玛露希尔与西丝尔的魔法羁绊。",
-    "verdict": "不是百合但玛露西丝CP极香，Trigger制作顶级。"
-  },
-  {
-    "id": "frieren",
-    "title": "葬送的芙莉莲",
-    "en": "Frieren: Beyond Journey's End",
-    "year": 2023,
-    "studio": "MADHOUSE",
-    "eps": 28,
-    "type": "TV",
-    "tags": [
-      "奇幻",
-      "哲学",
-      "治愈"
-    ],
-    "score": [
-      10,
-      10,
-      10,
-      3,
-      10
-    ],
-    "summary": "千年精灵魔法使的旅途，芙莉莲与费伦的师徒羁绊。",
-    "verdict": "不是百合但女性羁绊极深，年度神作。"
-  },
-  {
-    "id": "oshinoko-s2",
-    "title": "推しの子 第二季",
-    "en": "Oshi no Ko S2",
-    "year": 2024,
-    "studio": "動画工房",
-    "eps": 13,
-    "type": "TV",
-    "tags": [
-      "演艺",
-      "悬疑"
-    ],
-    "score": [
-      8,
-      8,
-      8,
-      4,
-      9
-    ],
-    "summary": "演艺界的黑暗与光芒，爱继续闪耀。",
-    "verdict": "第二季继续高能，轻百合点缀。"
   }
 ]

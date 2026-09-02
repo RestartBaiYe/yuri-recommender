@@ -33,7 +33,6 @@ const OVERRIDES = {
   "if-villainess": "The Magical Revolution of the Reincarnated Princess and the Genius Young Lady",
   "hitori-bocchi": "Hitoribocchi no Marumaru Seikatsu",
   "assault-lily": "Assault Lily Bouquet",
-  "aria": "Aria the Animation",
   "high-school-fleet": "High School Fleet",
   "uma-musume": "Uma Musume: Pretty Derby",
   "uma-musume2": "Uma Musume: Pretty Derby Season 2",
@@ -56,7 +55,6 @@ const OVERRIDES = {
   "bocchi-movie": "Bocchi the Rock! Re:",
   "hiro-no-kao": "This Monster Wants to Eat Me",
   "ga-rei-zero": "Ga-Rei Zero",
-  "mitsuboshi": "Mitsuboshi Colors",
   "d4dj": "D4DJ First Mix",
   "pallete": "Ochikobore Fruit Tart",
   "kamiina-botan": "Kamiina Botan, Yoeru Sugata wa Yuri no Hana",
@@ -64,9 +62,6 @@ const OVERRIDES = {
   "magia-record": "Magia Record: Mahou Shoujo Madoka☆Magica Gaiden",
   "slime-300": "Slime Taoshite 300-nen, Shiranai Uchi ni Level MAX ni Nattemashita",
   "vtuber-legend": "VTuber nanda ga Haishin Kiri Wasuretara Densetsu ni Natteta",
-  "frieren": "Sousou no Frieren",
-  "oshinoko-s2": "Oshi no Ko 2nd Season",
-  "ao-kanata": "Ao no Kanata no Four Rhythm",
   "dosanko": "Dosanko Gal wa Namara Menkoi",
 };
 
@@ -156,10 +151,17 @@ query($season: MediaSeason, $year: Int, $perPage: Int, $page: Int) {
       meanScore popularity
       seasonYear season
       episodes status format
+      genres
+      tags { name rank }
       studios { nodes { name } }
     }
   }
 }`;
+
+function tagRank(m, name) {
+  const t = (m.tags || []).find((x) => x.name === name);
+  return t ? t.rank : 0;
+}
 
 function mapMedia(m) {
   const romaji = m.title?.romaji || "";
@@ -180,7 +182,30 @@ function mapMedia(m) {
     status: m.status ?? null,
     format: m.format ?? null,
     studio,
+    genres: m.genres || [],
+    yuriRank: tagRank(m, "Yuri"),
+    maleProtRank: tagRank(m, "Male Protagonist"),
+    heteroRank: tagRank(m, "Heterosexual"),
+    femaleCastRank: tagRank(m, "Primarily Female Cast"),
+    femaleProtRank: tagRank(m, "Female Protagonist"),
+    cgdctRank: tagRank(m, "Cute Girls Doing Cute Things"),
   };
+}
+
+// 自动收录的“是否真百合”判定：AniList 的 Yuri 标签很宽泛，需结合相关度与 cast 结构客观过滤
+// 1) Yuri 标签相关度需≥40；2) 排除男主/异性恋主导；3) 需具备全女cast或女女恋爱信号
+const AUTO_BLOCK_IDS = new Set([
+  202102, // NEEDY GIRL OVERDOSE：单人主播心理剧，无女女关系
+]);
+function isYuriAuto(m) {
+  if (AUTO_BLOCK_IDS.has(m.anilistId)) return false;
+  if (m.yuriRank < 40) return false;
+  if (m.maleProtRank >= 60 || m.heteroRank >= 70) return false;
+  const romance = (m.genres || []).includes("Romance");
+  const femaleEnsemble = m.femaleCastRank >= 70 || m.cgdctRank >= 70;
+  const femaleRomance = romance && m.femaleProtRank >= 80;
+  const strongYuri = m.yuriRank >= 60 && (m.femaleCastRank >= 50 || m.femaleProtRank >= 80 || romance || (m.genres || []).includes("Mahou Shoujo") || (m.genres || []).includes("Slice of Life"));
+  return femaleEnsemble || femaleRomance || strongYuri;
 }
 
 function formatToType(f) {
@@ -335,6 +360,10 @@ async function main() {
         const mm = mapMedia(m);
         if (mm.status === "NOT_YET_RELEASED" && q.season !== nextSeason) continue;
         if (mm.popularity < 1500 && mm.meanScore == null) continue;
+        if (!isYuriAuto(mm)) {
+          process.stdout.write(`    跳过非百合 #${m.id} ${mm.native || mm.romaji}（Yuri相关度${mm.yuriRank}）\n`);
+          continue;
+        }
         autoAdd.push(mm);
         knownAnilistIds.add(m.id);
         got++;

@@ -1,16 +1,10 @@
 {
-  "generatedAt": "2026-09-02T09:51:24.641Z",
-  "total": 236,
-  "curatedCount": 209,
-  "autoCount": 27,
+  "generatedAt": "2026-09-02T12:15:19.288Z",
+  "total": 198,
+  "curatedCount": 185,
+  "autoCount": 13,
   "currentSeason": "SUMMER 2026",
   "unmatched": [
-    {
-      "id": "denki-gai",
-      "title": "电器街的漫画店",
-      "en": "Denkigai no Honya-san",
-      "bestSim": "0.00"
-    },
     {
       "id": "sae",
       "title": "佐伯沙弥香的追忆",
