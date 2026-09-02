@@ -4,7 +4,7 @@
 
 一个**静态、免后端、实时更新**的百合番推荐站。数据来自 AniList 社区，通过 GitHub Actions 定时同步；他人评价（AniList 社区均分/人气）会实时影响每部番的排位。
 
-🌐 **在线地址**：`https://<你的 GitHub 用户名>.github.io/yuri-recommender/`（启用 Pages 后可用）
+🌐 **在线地址**：[https://restartbaiye.github.io/yuri-recommender/](https://restartbaiye.github.io/yuri-recommender/)（GitHub Pages，推送 main 即自动部署）
 
 ---
 
