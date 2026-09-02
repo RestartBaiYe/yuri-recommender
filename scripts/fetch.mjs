@@ -208,7 +208,8 @@ async function main() {
 
   // 增量模式：已成功富化（有 anilistId 且封面）且不在 OVERRIDES 中的条目直接复用
   const prevById = new Map();
-  if (INCREMENTAL && fs.existsSync(animePath)) {
+  // 始终加载上期结果：增量模式用于跳过已成功条目；全量模式用于“防回退”（本次抓取失败时沿用上期）
+  if (fs.existsSync(animePath)) {
     const prev = JSON.parse(fs.readFileSync(animePath, "utf-8"));
     for (const p of prev) if (p.source === "curated") prevById.set(p.id, p);
   }
@@ -218,6 +219,7 @@ async function main() {
   const unmatched = [];
   let i = 0;
   let reused = 0;
+  let recovered = 0;
   for (const item of curated) {
     i++;
     if (INCREMENTAL && !OVERRIDES[item.id] && prevById.has(item.id) && prevById.get(item.id).cover) {
@@ -272,13 +274,21 @@ async function main() {
       const flag = sim < 0.75 ? `(中置信 ${sim.toFixed(2)})` : "";
       process.stdout.write(`  ✓ ${item.id} -> #${matched.anilistId} ${matched.romaji} ${flag}\n`);
     } else {
-      unmatched.push({ id: item.id, title: item.title, en: item.en, bestSim: bestSim.toFixed(2) });
-      process.stdout.write(`  ✗ ${item.id} 未匹配（bestSim=${bestSim.toFixed(2)}）\n`);
-      enriched.push({ ...item, source: "curated", cover: null, meanScore: null, popularity: 0, anilistId: null });
+      const prev = prevById.get(item.id);
+      if (prev && prev.anilistId && prev.cover) {
+        // 本次因限流/网络未匹配到，但上期有成功数据 → 沿用上期，避免数据回退
+        enriched.push(prev);
+        recovered++;
+        process.stdout.write(`  ↺ ${item.id} 本次未匹配，沿用上期 #${prev.anilistId}（bestSim=${bestSim.toFixed(2)}）\n`);
+      } else {
+        unmatched.push({ id: item.id, title: item.title, en: item.en, bestSim: bestSim.toFixed(2) });
+        process.stdout.write(`  ✗ ${item.id} 未匹配（bestSim=${bestSim.toFixed(2)}）\n`);
+        enriched.push({ ...item, source: "curated", cover: null, meanScore: null, popularity: 0, anilistId: null });
+      }
     }
     await sleep(REQ_DELAY_MS);
   }
-  console.log(`[2/3] curated 富化完成：成功 ${enriched.filter((e) => e.anilistId).length}/${enriched.length}，未匹配 ${unmatched.length}${reused ? `，复用 ${reused}` : ""}`);
+  console.log(`[2/3] curated 富化完成：成功 ${enriched.filter((e) => e.anilistId).length}/${enriched.length}，未匹配 ${unmatched.length}${reused ? `，增量复用 ${reused}` : ""}${recovered ? `，防回退沿用 ${recovered}` : ""}`);
 
   /* ----- 自动收录当季 / 下季 / 上季 Yuri 新番 ----- */
   const now = new Date();

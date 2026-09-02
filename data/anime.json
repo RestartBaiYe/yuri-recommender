@@ -1045,7 +1045,7 @@
     "title": "天使降临到我身边",
     "en": "Watashi ni Tenshi ga Maiorita!",
     "year": 2019,
-    "studio": "動画工房",
+    "studio": "Doga Kobo / flying DOG / Kadokawa Shoten / Sony Music Communications / Kadokawa Media House / AT-X / Ichijinsha",
     "eps": 13,
     "type": "TV",
     "tags": [
@@ -1062,11 +1062,19 @@
     ],
     "summary": "怕生的宫子学姐与小学生白咲花的互动，浓度偏高的小学生百合。",
     "verdict": "被无数人奉为治愈神作，注意尺度。",
-    "source": "curated",
-    "cover": null,
-    "meanScore": null,
-    "popularity": 0,
-    "anilistId": null
+    "anilistId": 102680,
+    "romaji": "Watashi ni Tenshi ga Maiorita!",
+    "english": "WATATEN!: an Angel Flew Down to Me",
+    "native": "私に天使が舞い降りた！",
+    "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx102680-75Mgrnn65PAg.png",
+    "meanScore": 70,
+    "popularity": 64743,
+    "seasonYear": 2019,
+    "season": "WINTER",
+    "episodes": 12,
+    "status": "FINISHED",
+    "format": "TV",
+    "source": "curated"
   },
   {
     "id": "hitori-bocchi",
@@ -2421,7 +2429,7 @@
     "title": "恶魔之谜",
     "en": "Akuma no Riddle",
     "year": 2014,
-    "studio": "Diomedea",
+    "studio": "diomedéa / DAX Production / Pony Canyon / Funimation",
     "eps": 12,
     "type": "TV",
     "tags": [
@@ -2437,11 +2445,19 @@
     ],
     "summary": "暗杀者少女们的学园，一之濑晴与东兔角。",
     "verdict": "百合浓度高的暗杀题材。",
-    "source": "curated",
-    "cover": null,
-    "meanScore": null,
-    "popularity": 0,
-    "anilistId": null
+    "anilistId": 19429,
+    "romaji": "Akuma no Riddle",
+    "english": "Riddle Story of Devil",
+    "native": "悪魔のリドル",
+    "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx19429-DqVIQgPV0STD.jpg",
+    "meanScore": 64,
+    "popularity": 61502,
+    "seasonYear": 2014,
+    "season": "SPRING",
+    "episodes": 12,
+    "status": "FINISHED",
+    "format": "TV",
+    "source": "curated"
   },
   {
     "id": "kaname",
@@ -3293,7 +3309,7 @@
     "native": "私を喰べたい、ひとでなし",
     "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx183385-f1TgnttLckBT.jpg",
     "meanScore": 74,
-    "popularity": 42825,
+    "popularity": 42852,
     "seasonYear": 2025,
     "season": "FALL",
     "episodes": 13,
@@ -4270,7 +4286,7 @@
     "title": "魔法骑士雷阿斯",
     "en": "Magic Knight Rayearth",
     "year": 1994,
-    "studio": "TMS",
+    "studio": "Tokyo Movie Shinsha / Discotek / Yomiuri TV / Dentsu",
     "eps": 20,
     "type": "TV",
     "tags": [
@@ -4287,11 +4303,19 @@
     ],
     "summary": "三位少女被召唤到塞费罗，成为魔法骑士。",
     "verdict": "CLAMP早期的少女群像，光海风的羁绊。",
-    "source": "curated",
-    "cover": null,
-    "meanScore": null,
-    "popularity": 0,
-    "anilistId": null
+    "anilistId": 435,
+    "romaji": "Magic Knight Rayearth",
+    "english": "Magic Knight Rayearth",
+    "native": "魔法騎士（マジックナイト）レイアース",
+    "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx435-WO3USrR2jB5u.png",
+    "meanScore": 72,
+    "popularity": 21066,
+    "seasonYear": 1994,
+    "season": "FALL",
+    "episodes": 20,
+    "status": "FINISHED",
+    "format": "TV",
+    "source": "curated"
   },
   {
     "id": "sailor-moon",
@@ -5735,7 +5759,7 @@
     "title": "打了300年的史莱姆",
     "en": "Slime 300",
     "year": 2021,
-    "studio": "REVOROOT",
+    "studio": "REVOROOT / Nippon Columbia / Studio Mausu / BS11 / AT-X / Hakuhodo DY Music & Pictures / Medicos Entertainment / Movic / Bushiroad / KLOCKWORX / Square Enix / SB Creative / DMM.com",
     "eps": 12,
     "type": "TV",
     "tags": [
@@ -5751,11 +5775,19 @@
     ],
     "summary": "最强魔女与同居少女们的日常。",
     "verdict": "轻松异世界轻百合。",
-    "source": "curated",
-    "cover": null,
-    "meanScore": null,
-    "popularity": 0,
-    "anilistId": null
+    "anilistId": 112608,
+    "romaji": "Slime Taoshite 300-nen, Shiranai Uchi ni Level MAX ni Nattemashita",
+    "english": "I've Been Killing Slimes for 300 Years and Maxed Out My Level",
+    "native": "スライム倒して300年、知らないうちにレベルMAXになってました",
+    "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx112608-T3OKdLhxYUfe.png",
+    "meanScore": 68,
+    "popularity": 139008,
+    "seasonYear": 2021,
+    "season": "SPRING",
+    "episodes": 12,
+    "status": "FINISHED",
+    "format": "TV",
+    "source": "curated"
   },
   {
     "id": "uma-musume3",
@@ -7341,11 +7373,11 @@
       9.5
     ],
     "summary": "AniList 自动收录的 Yuri 作品（社区均分 7.6）。评分维度为基于社区数据的估计值。",
-    "verdict": "社区均分 7.6 / 10，人气 50,819。详情见 AniList。",
+    "verdict": "社区均分 7.6 / 10，人气 51,091。详情见 AniList。",
     "anilistId": 177699,
     "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177699-hnzc1CS5ZSM2.png",
     "meanScore": 76,
-    "popularity": 50819,
+    "popularity": 51091,
     "source": "auto"
   },
   {
@@ -7395,11 +7427,11 @@
       9
     ],
     "summary": "AniList 自动收录的 Yuri 作品（社区均分 7.6）。评分维度为基于社区数据的估计值。",
-    "verdict": "社区均分 7.6 / 10，人气 30,496。详情见 AniList。",
+    "verdict": "社区均分 7.6 / 10，人气 30,634。详情见 AniList。",
     "anilistId": 177637,
     "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177637-8onaQWqKW1C3.jpg",
     "meanScore": 76,
-    "popularity": 30496,
+    "popularity": 30634,
     "source": "auto"
   },
   {
@@ -7693,11 +7725,11 @@
       8
     ],
     "summary": "AniList 自动收录的 2026 年 fall季 Yuri 新番（社区均分 —）。评分维度为基于社区数据的估计值。",
-    "verdict": "社区均分 暂无 / 10，人气 7,063。详情见 AniList。",
+    "verdict": "社区均分 暂无 / 10，人气 7,111。详情见 AniList。",
     "anilistId": 178972,
     "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx178972-wk88qoyg9HvZ.jpg",
     "meanScore": null,
-    "popularity": 7063,
+    "popularity": 7111,
     "source": "auto"
   },
   {
@@ -7937,11 +7969,11 @@
       8.5
     ],
     "summary": "AniList 自动收录的 Yuri 作品（社区均分 7.3）。评分维度为基于社区数据的估计值。",
-    "verdict": "社区均分 7.3 / 10，人气 12,935。详情见 AniList。",
+    "verdict": "社区均分 7.3 / 10，人气 12,942。详情见 AniList。",
     "anilistId": 177501,
     "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177501-BwdlSMEXGZWz.png",
     "meanScore": 73,
-    "popularity": 12935,
+    "popularity": 12942,
     "source": "auto"
   },
   {
