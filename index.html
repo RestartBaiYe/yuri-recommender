@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>花占卜 · 百合番推荐器</title>
+<meta name="description" content="基于 AniList 实时数据的花占卜百合番推荐器：联网自动更新新番与封面，融合社区评分与个人评分动态排序。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+  :root{
+    --paper:#fbf3ec;--paper-2:#f5e9de;--ink:#3a2430;--ink-soft:#6e5560;
+    --rose:#d86a8a;--rose-deep:#b14a6c;--petal:#f2b8c9;--petal-soft:#f9dde4;
+    --lav:#b6a0c9;--line:rgba(58,36,48,.14);--card-bg:#fffaf6;
+    --shadow:0 1px 2px rgba(58,36,48,.05),0 12px 32px -18px rgba(58,36,48,.28);
+    --serif:"Noto Serif SC",serif;--sans:"Noto Sans SC",sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");mix-blend-mode:multiply}
+  .wrap{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 24px}
+
+  header.site{display:flex;align-items:baseline;justify-content:space-between;padding:22px 0;border-bottom:1px solid var(--line);gap:12px;flex-wrap:wrap}
+  .brand{font-family:var(--serif);font-weight:700;font-size:15px;letter-spacing:.35em}
+  .brand em{font-style:normal;color:var(--rose-deep)}
+  .brand .sep{color:var(--petal);margin:0 .4em}
+  .brand small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.22em;color:var(--ink-soft);margin-top:2px}
+  .site-count{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-soft)}
+  .site-count b{color:var(--rose-deep);font-weight:500}
+  .update-line{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--lav);margin-top:2px}
+  .update-line b{color:var(--rose-deep);font-weight:500}
+
+  .hero{padding:54px 0 30px;text-align:center;position:relative}
+  .hero .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--rose-deep)}
+  .hero .eyebrow::before,.hero .eyebrow::after{content:"";width:26px;height:1px;background:var(--petal)}
+  .hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(32px,5.5vw,54px);line-height:1.18;letter-spacing:.06em;margin:16px 0 10px}
+  .hero h1 .accent{display:inline-block;color:var(--rose-deep);position:relative;white-space:nowrap}
+  .hero h1 .accent::after{content:"";position:absolute;left:-4px;right:-4px;bottom:2px;height:12px;background:var(--petal-soft);z-index:-1;border-radius:6px 12px 8px 14px;transform:rotate(-1.2deg)}
+  .hero p.lead{max-width:600px;margin:0 auto;color:var(--ink-soft);font-size:15px}
+  .hero p.lead b{color:var(--ink);font-weight:500}
+  .hero .petal-row{display:flex;justify-content:center;gap:14px;margin-top:22px;color:var(--petal)}
+  .hero .petal-row svg{width:14px;height:14px}
+  .hero .petal-row svg:nth-child(2){transform:scale(1.3);color:var(--rose)}
+
+  .control{max-width:880px;margin:24px auto 0;background:var(--card-bg);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px 28px 20px}
+  .control-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+  .control-head h2{font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.04em}
+  .control-head .hint{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink-soft)}
+  .reset{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--rose-deep);background:none;border:1px solid rgba(177,74,108,.35);border-radius:999px;padding:5px 14px;cursor:pointer;transition:.2s}
+  .reset:hover{background:var(--petal-soft);border-color:var(--rose-deep)}
+  .sliders{display:flex;flex-direction:column;gap:12px}
+  .row{display:grid;grid-template-columns:150px 1fr 46px;align-items:center;gap:14px}
+  .row label{font-size:13px;color:var(--ink);display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .row label .dot{width:8px;height:8px;border-radius:50%}
+  .row output{font-family:var(--mono);font-size:12px;color:var(--rose-deep);text-align:right}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:linear-gradient(90deg,var(--pc) var(--pct,50%),var(--petal-soft) var(--pct,50%))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;margin-top:-6px;background:#fff;border:2px solid var(--pc);box-shadow:0 1px 4px rgba(58,36,48,.25);transition:.15s}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:var(--petal-soft)}
+  input[type=range]::-moz-range-progress{height:4px;border-radius:99px;background:var(--pc)}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--pc);box-shadow:0 1px 4px rgba(58,36,48,.25)}
+  .panel-foot{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);gap:12px;flex-wrap:wrap}
+  .panel-foot .live{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink-soft)}
+  .panel-foot .live b{color:var(--rose-deep)}
+  .top-pick{font-family:var(--serif);font-size:13px;color:var(--rose-deep)}
+  .top-pick b{font-weight:900}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin:34px 0 16px}
+  .search-box{flex:1 1 260px;position:relative;max-width:360px}
+  .search-box input{width:100%;font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--card-bg);border:1px solid var(--line);border-radius:999px;padding:9px 14px 9px 34px;outline:none;transition:.2s}
+  .search-box input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(216,106,138,.15)}
+  .search-box .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--petal);font-size:14px;pointer-events:none}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-soft);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;transition:.18s}
+  .chip:hover{border-color:var(--rose);color:var(--rose-deep)}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .sort-box{display:flex;align-items:center;gap:10px}
+  .sort-box label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-soft)}
+  .sort-box select{font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--card-bg);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;outline:none}
+
+  .result-line{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-soft);margin:6px 0 14px}
+  .result-line b{color:var(--rose-deep);font-weight:500}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;padding-bottom:30px}
+  .card{position:relative;background:var(--card-bg);border:1px solid var(--line);border-radius:18px;padding:0;box-shadow:var(--shadow);cursor:pointer;transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s;display:flex;flex-direction:column;gap:0;overflow:hidden}
+  .card:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(58,36,48,.06),0 22px 44px -18px rgba(58,36,48,.35)}
+  .card:focus-visible{outline:3px solid var(--petal);outline-offset:2px}
+  .card-cover{position:relative;width:100%;height:180px;overflow:hidden;background:linear-gradient(135deg,var(--petal-soft),var(--paper-2))}
+  .card-cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+  .card:hover .card-cover img{transform:scale(1.04)}
+  .card-cover .cover-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:32px;font-weight:900;color:rgba(177,74,108,.18);letter-spacing:.1em;background:linear-gradient(135deg,var(--petal-soft) 0%,var(--paper-2) 50%,rgba(182,160,201,.15) 100%)}
+  .card-cover .rank-overlay{position:absolute;top:10px;right:10px;font-family:var(--serif);font-weight:900;font-size:28px;line-height:1;color:rgba(255,255,255,.9);text-shadow:0 2px 8px rgba(58,36,48,.4);z-index:2}
+  .card-cover .rank-overlay.r1{color:#fff;text-shadow:0 2px 12px rgba(177,74,108,.7)}
+  .card-cover .badge-cover{position:absolute;top:10px;left:10px;font-family:var(--serif);font-size:10px;letter-spacing:.1em;color:#fff;background:var(--rose-deep);border-radius:999px;padding:3px 10px;z-index:2;opacity:0;transition:.25s}
+  .card-cover .badge-cover.show{opacity:1}
+  .card-cover .comm-badge{position:absolute;bottom:8px;left:8px;font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:#fff;background:rgba(58,36,48,.62);border-radius:999px;padding:2px 8px;z-index:2;backdrop-filter:blur(2px)}
+  .card-cover .comm-badge b{color:var(--petal)}
+  .card-body{padding:14px 18px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .card h3{font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.02em;line-height:1.35}
+  .card h3 small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink-soft);margin-top:3px;font-weight:400}
+  .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-soft);display:flex;flex-wrap:wrap;gap:4px 10px}
+  .meta .y{color:var(--rose-deep)}
+  .tags{display:flex;flex-wrap:wrap;gap:5px}
+  .tag{font-size:11px;color:var(--rose-deep);background:var(--petal-soft);border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+  .tag.auto{color:#fff;background:var(--lav)}
+  .card .desc{font-size:12.5px;color:var(--ink-soft);line-height:1.65;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card .scorebar{display:flex;align-items:baseline;gap:8px;border-top:1px dashed var(--line);padding-top:10px;flex-wrap:wrap}
+  .card .score-num{font-family:var(--serif);font-weight:900;font-size:22px;color:var(--rose-deep)}
+  .card .score-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink-soft)}
+  .card .score-label.mine{color:var(--rose)}
+  .radar-wrap{display:flex;align-items:center;justify-content:center;padding:2px 0}
+  .radar-wrap canvas{width:120px;height:120px;display:block}
+  .tap{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--lav);text-align:right}
+
+  /* Help button & modal */
+  .help-btn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--rose-deep);background:none;border:1px solid rgba(177,74,108,.3);border-radius:50%;width:30px;height:30px;cursor:pointer;transition:.2s;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+  .help-btn:hover{background:var(--petal-soft);border-color:var(--rose-deep)}
+  .help-content h3{font-family:var(--serif);font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--rose-deep)}
+  .help-content h3:first-child{margin-top:0}
+  .help-content p,.help-content li{font-size:13.5px;line-height:1.8;color:var(--ink-soft);margin-bottom:6px}
+  .help-content ul{padding-left:20px;margin-bottom:10px}
+  .help-content .tip{background:var(--petal-soft);border-radius:12px;padding:12px 16px;font-size:12.5px;color:var(--ink);margin:12px 0;line-height:1.7}
+  .help-content .tip b{color:var(--rose-deep)}
+  .modal-cover{width:100%;max-height:280px;object-fit:cover;border-radius:14px;margin-bottom:16px}
+  .modal-cover-fallback{width:100%;height:120px;border-radius:14px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:42px;font-weight:900;color:rgba(177,74,108,.15);background:linear-gradient(135deg,var(--petal-soft),var(--paper-2),rgba(182,160,201,.15))}
+
+  .load-more-wrap{text-align:center;padding:10px 0 60px}
+  .load-more{font-family:var(--serif);font-size:14px;letter-spacing:.2em;color:var(--rose-deep);background:transparent;border:1px solid rgba(177,74,108,.4);border-radius:999px;padding:11px 36px;cursor:pointer;transition:.2s}
+  .load-more:hover{background:var(--petal-soft);border-color:var(--rose-deep)}
+  .load-more:disabled{opacity:.4;cursor:default}
+
+  .empty{grid-column:1/-1;text-align:center;padding:60px 0;color:var(--ink-soft);font-family:var(--serif);font-size:15px}
+  .empty b{color:var(--rose-deep)}
+
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(58,36,48,.42);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
+  .overlay.open{display:flex}
+  .modal{background:var(--paper);border-radius:22px;max-width:760px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 30px 80px -30px rgba(58,36,48,.5);padding:34px 36px;position:relative;animation:rise .3s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .modal-close{position:absolute;top:16px;right:18px;background:none;border:1px solid var(--line);border-radius:50%;width:34px;height:34px;font-size:16px;color:var(--ink-soft);cursor:pointer;transition:.2s;line-height:1}
+  .modal-close:hover{background:var(--petal-soft);border-color:var(--rose-deep);color:var(--rose-deep)}
+  .modal h2{font-family:var(--serif);font-size:26px;font-weight:900;letter-spacing:.03em;margin-bottom:2px}
+  .modal h2 small{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-soft);margin-top:6px;font-weight:400}
+  .modal .meta-line{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-soft);margin:10px 0 14px}
+  .modal .meta-line .y{color:var(--rose-deep)}
+  .modal .tagline{font-size:14.5px;line-height:1.8;color:var(--ink);margin-bottom:18px}
+  .score-block{display:grid;grid-template-columns:1fr 220px;gap:26px;align-items:center;margin:6px 0 18px}
+  .bars{display:flex;flex-direction:column;gap:9px}
+  .bar-row{display:grid;grid-template-columns:110px 1fr 34px;align-items:center;gap:10px}
+  .bar-row .name{font-size:12.5px;color:var(--ink)}
+  .bar-row .track{height:7px;background:var(--petal-soft);border-radius:99px;overflow:hidden}
+  .bar-row .fill{height:100%;border-radius:99px;background:var(--dc);width:0;transition:width .5s ease}
+  .bar-row .val{font-family:var(--mono);font-size:12px;color:var(--ink-soft);text-align:right}
+  .modal .radar-lg{width:220px;height:220px}
+  .modal .radar-lg canvas{width:100%;height:100%;display:block}
+  .modal .verdict{font-family:var(--serif);font-size:14px;line-height:1.9;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:14px}
+  .modal .verdict b{color:var(--rose-deep)}
+  .modal .notes{margin-top:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--lav)}
+
+  /* 社区/个人评分区 */
+  .community-box{display:flex;flex-wrap:wrap;gap:10px 22px;margin:4px 0 16px;padding:12px 16px;background:var(--card-bg);border:1px solid var(--line);border-radius:14px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink-soft)}
+  .community-box .item{display:flex;flex-direction:column;gap:2px}
+  .community-box .item .k{font-size:10px;letter-spacing:.14em;color:var(--lav)}
+  .community-box .item .v{font-size:14px;font-weight:700;color:var(--rose-deep)}
+  .community-box .item .v small{font-size:10px;font-weight:400;color:var(--ink-soft)}
+  .myrate{display:flex;align-items:center;gap:12px;margin:14px 0;padding:10px 14px;background:var(--petal-soft);border-radius:12px;flex-wrap:wrap}
+  .myrate .mr-label{font-family:var(--serif);font-size:13px;font-weight:700;color:var(--rose-deep)}
+  .myrate input{flex:1;min-width:140px}
+  .myrate output{font-family:var(--mono);font-size:12px;color:var(--rose-deep);min-width:52px;text-align:right}
+  .myrate .mr-clear{font-family:var(--mono);font-size:10px;color:var(--ink-soft);background:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
+  .myrate .mr-clear:hover{color:var(--rose-deep);border-color:var(--rose-deep)}
+  .note-auto{display:block;margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--lav)}
+
+  @media(max-width:720px){
+    .score-block{grid-template-columns:1fr;gap:16px}
+    .modal .radar-lg{width:200px;height:200px;margin:0 auto}
+    .row{grid-template-columns:1fr 46px;gap:8px}
+    .row label{grid-column:1/-1;margin-top:2px}
+    .control{padding:20px 18px}
+    .hero{padding:40px 0 22px}
+    .search-box{max-width:100%}
+    .card-cover{height:150px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<header class="site wrap">
+  <div class="brand">花占<em>卜</em><span class="sep">·</span><small>HANA&nbsp;UROKOTO&nbsp;LL INDEX</small></div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="site-count" style="text-align:right">收录 <b id="total-count">0</b> 部<br><span class="update-line" id="update-line">数据加载中…</span></div>
+    <button class="help-btn" id="help-btn" title="使用说明">?</button>
+  </div>
+</header>
+
+<section class="hero wrap">
+  <div class="eyebrow">HANA&nbsp;UROKOTO&nbsp;/&nbsp;百合番剧索引</div>
+  <h1>想要怎样的<span class="accent">心跳</span>？</h1>
+  <p class="lead">把滑杆推向你在意的方向——<b>剧情</b>、<b>角色</b>、<b>画面</b>、<b>浓度</b>，还是<b>人气</b>。
+    数据来自 AniList 实时更新，社区评分会影响每一部番的排位。</p>
+  <div class="petal-row" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c3 3.5 6 8 6 12a6 6 0 0 1-12 0c0-4 3-8.5 6-12z"/></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c3 3.5 6 8 6 12a6 6 0 0 1-12 0c0-4 3-8.5 6-12z"/></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c3 3.5 6 8 6 12a6 6 0 0 1-12 0c0-4 3-8.5 6-12z"/></svg>
+  </div>
+</section>
+
+<section class="control wrap">
+  <div class="control-head">
+    <h2>占卜你的偏好</h2>
+    <span class="hint">WEIGHT&nbsp;·&nbsp;权重</span>
+  </div>
+  <div class="sliders" id="sliders"></div>
+  <div class="panel-foot">
+    <div class="live">实时重排 · <b id="match-count">0</b> 部符合</div>
+    <div class="top-pick" id="top-pick"></div>
+    <button class="reset" id="reset">重置权重</button>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="ic">⌕</span>
+      <input type="search" id="search" placeholder="搜番名 / 标签 / 年份 / 制作公司…" autocomplete="off">
+    </div>
+    <div class="sort-box">
+      <label for="sort">排序</label>
+      <select id="sort">
+        <option value="score" selected>占卜结果</option>
+        <option value="year">年份</option>
+        <option value="name">名称</option>
+        <option value="kuchisu">百合浓度</option>
+        <option value="community">社区均分</option>
+      </select>
+    </div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="result-line">共 <b id="result-count">0</b> 部符合条件</div>
+  <div class="grid" id="grid"></div>
+  <div class="load-more-wrap">
+    <button class="load-more" id="load-more">展开更多 ↓</button>
+  </div>
+</section>
+
+<footer class="wrap" style="border-top:1px solid var(--line);padding:22px 0 46px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between">
+  <div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ink-soft)">HANA&nbsp;UROKOTO&nbsp;·&nbsp;主观评分 + AniList 社区数据 · 评分随阅历会变</div>
+  <div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--petal)">ゆりかごのように、ゆれる心へ。</div>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" id="modal">
+    <button class="modal-close" id="modal-close" aria-label="关闭">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="overlay" id="help-overlay">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:600px">
+    <button class="modal-close" id="help-close" aria-label="关闭">✕</button>
+    <div class="help-content">
+      <h2 style="font-family:var(--serif);font-size:22px;font-weight:900;margin-bottom:4px">📖 使用说明</h2>
+      <p style="font-family:var(--mono);font-size:11px;color:var(--ink-soft);letter-spacing:.1em;margin-bottom:16px">HOW TO USE · 花占卜指南</p>
+      <h3>🌸 权重滑杆</h3>
+      <p>页面顶部有五个滑杆，分别控制<b>剧情与深度</b>、<b>角色塑造</b>、<b>作画/演出/音乐</b>、<b>百合浓度</b>、<b>热门程度</b>的权重。把滑杆推向你最在意的方向，下方番剧列表会根据你的偏好实时重新排序。</p>
+      <h3>🌐 实时数据</h3>
+      <p>番剧库通过 GitHub Actions 定时从 <b>AniList</b> 同步：自动补充最新季度 Yuri 新番、更新封面与社区评分。页面头部会显示「数据更新于」时间戳。离线时使用内置的精编数据兜底。</p>
+      <h3>🗳️ 社区评分与我的评分</h3>
+      <p><b>热门程度</b>维度是动态的：融合了 AniList 社区均分、社区人气与手工人气，因此其他用户（AniList 社区）的评价会实时影响每部番的排位。点击卡片进入详情后，你可以用「我的评分」滑杆给自己看过的番打分，评分保存在本机浏览器（localStorage），并会替代社区均分参与你自己的排名计算。</p>
+      <h3>🔍 搜索与筛选</h3>
+      <p>在搜索框中输入番名、标签、年份或制作公司即可快速筛选。点击下方标签芯片可以按类型过滤；「自动收录」标签代表由 AniList 自动发现的新番，评分为社区数据估算。</p>
+      <h3>📊 排序方式</h3>
+      <p>支持五种排序：<b>占卜结果</b>（按加权分数）、<b>年份</b>（最新优先）、<b>名称</b>（字母序）、<b>百合浓度</b>（浓度优先）、<b>社区均分</b>（AniList 均分优先）。</p>
+      <div class="tip"><b>💡 小贴士：</b>点击「重置权重」可恢复默认值；五维评分除「热门程度」外为主观评价，仅供参考；收录范围含真百合、轻百合与自动收录新番。</div>
+      <h3>📝 评分说明</h3>
+      <ul>
+        <li>五维评分均采用 10 分制；综合分 = 各维度 × 对应权重 的加权平均</li>
+        <li>「热门程度」= 手工人气×0.45 + 社区均分×0.35 + 社区人气×0.20（有「我的评分」时社区均分由我的评分替代）</li>
+        <li>社区均分来自 AniList 用户评价（0-10 分），实时同步</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+ * 花占卜 · 百合番推荐器 (v2)
+ * - 内置精编数据兜底；联网时优先加载 data/anime.json（AniList 同步）
+ * - 封面：AniList → MAL 兜底 → 渐变首字
+ * - 社区评分（AniList 社区均分/人气）+ 个人评分（localStorage）
+ * ================================================================ */
+const FALLBACK_ANIME = [{"id":"bloom-into-you","title":"终将成为你","en":"Yagate Kimi ni Naru","year":2018,"studio":"TROYCA","eps":13,"type":"TV","tags":["神作","心理","文学","慢热"],"score":[10,10,9,9,8],"summary":"无法喜欢上别人的小糸侑，遇见了谁都会喜欢的七海灯子。少女漫式的对称与倒错被写得纤毫毕现，百合心理剧的天花板。","verdict":"慢热但每一句台词都值得重读。看动画务必补漫画完结篇。"},{"id":"citrus","title":"Citrus","en":"Citrus","year":2018,"studio":"Passione","eps":12,"type":"TV","tags":["重组家庭","义姐妹","直球","恋爱"],"score":[6,7,6,10,7],"summary":"因为再婚成为义姐妹的柚子与芽衣，从互相抵触到难以自控。直球浓度在商业动画里数一数二。","verdict":"剧情狗血、浓度顶级。想被毫不含蓄的感情砸一脸就选它。"},{"id":"gundam-witch","title":"机动战士高达 水星的魔女","en":"Mobile Suit G-Witch","year":2022,"studio":"SUNRISE","eps":25,"type":"TV","tags":["高达","机甲","商战","直球"],"score":[8,8,9,8,9],"summary":"狸猫与米奥琳涅的「契约婚姻」裹着高达与政商博弈的壳。主角感情线直球而坚定，最终话名场面永流传。","verdict":"想不费脑磕糖又要高规格制作，这部把「商业互撩」做到了极致。"},{"id":"mygo","title":"BanG Dream! It's MyGO!!!!!","en":"It's MyGO!!!!!","year":2023,"studio":"SANZIGEN","eps":13,"type":"TV","tags":["乐队","重女","情绪戏"],"score":[9,10,9,5,8],"summary":"组乐队的少女们把乐队当成了互相伤害又互相救赎的容器。春日影每一次响起都是心理战的刀光。","verdict":"浓度不高但角色间的磁场让人着魔。适合喜欢心理戏和台词对撞的人。"},{"id":"ave-mujica","title":"BanG Dream! Ave Mujica","en":"Ave Mujica","year":2025,"studio":"SANZIGEN","eps":13,"type":"TV","tags":["乐队","重女","黑暗","续作"],"score":[8,9,9,5,7],"summary":"MyGO 的镜像——祥子组的 Ave Mujica。面具之下是更深的执念与更锋利的关系网。","verdict":"延续 MyGO 的情绪密度且更黑暗。角色张力拉满。"},{"id":"lycoris-recoil","title":"Lycoris Recoil 莉可丽丝","en":"Lycoris Recoil","year":2022,"studio":"A-1 Pictures","eps":13,"type":"TV","tags":["动作","特工","双女主","人气"],"score":[8,8,9,6,9],"summary":"「无条件的信任」——千束与泷奈。动作戏流畅，双人组默契满分，百合是暗线但氛围感人。","verdict":"顶级制作+双女主化学反应，不要求明牌告白，这部很稳。"},{"id":"madoka","title":"魔法少女小圆","en":"Puella Magi Madoka Magica","year":2011,"studio":"SHAFT","eps":12,"type":"TV","tags":["神作","致郁","魔法少女"],"score":[10,10,10,5,10],"summary":"圆与晓美焰的因果轮回，被魔法少女代价的残酷命题反复碾磨。焰的执念是无数人入坑百合的原因。","verdict":"在浓度上克制，却在灵魂上死死纠缠。配得上一切溢美之词。"},{"id":"utena","title":"少女革命","en":"Shoujo Kakumei Utena","year":1997,"studio":"J.C.STAFF","eps":39,"type":"TV","tags":["经典","象征主义","剧场"],"score":[10,10,9,6,7],"summary":"用玫瑰与决斗重构「王子与公主」神话的寓言。意象繁复、性别议题锋利，百合谱系的奠基之作。","verdict":"被称「动画界的萨特」。适合想读象征、读懂安希的人。"},{"id":"mari-mite","title":"圣母在上","en":"Maria-sama ga Miteru","year":1998,"studio":"Studio Deen","eps":39,"type":"TV","tags":["经典","学院","慢热"],"score":[8,9,7,8,7],"summary":"莉莉安女子学园的「姐姐·妹妹」制度，祥子与祐巳小心翼翼的书信与约定。百合原教旨：暧昧、克制、欲言又止。","verdict":"想体会「氛围百合」的教科书。需要一点耐心和少女心。"},{"id":"if-villainess","title":"转生王女与天才千金的魔法革命","en":"Tensei Ojo to Tensai Reijou","year":2023,"studio":"diomedéa","eps":12,"type":"TV","tags":["异世界","魔法","直球"],"score":[8,8,8,9,7],"summary":"安尼斯与尤菲，一个革魔法的命，一个想走出完美的阴影。双女主并肩作战结构扎实，关系推进又快又甜。","verdict":"浓度高且不拖泥带水。想看「认认真真谈恋爱」的安心之选。"},{"id":"fragtime","title":"Fragtime","en":"Fragtime","year":2019,"studio":"TMS","eps":1,"type":"剧场","tags":["超能力","校园","初次"],"score":[7,7,8,9,5],"summary":"时间停止三分钟的少女，把全校人冻住，却独独对那名同学起不了作用。短小精悍的青春告白。","verdict":"半小时把「第一次喜欢」的慌乱讲得淋漓尽致。浓度爱好者必看。"},{"id":"yuru-yuri","title":"摇曳百合","en":"Yuru Yuri","year":2011,"studio":"動画工房","eps":36,"type":"TV","tags":["日常","搞笑","治愈"],"score":[7,7,7,8,8],"summary":"阿卡林等人的「娱乐部」日常。搞笑为主、糖分点缀，治愈系百合物语的代名词。","verdict":"想放松想笑想看少女们吵吵闹闹，选它。浓度是甜点不是主菜。"},{"id":"sakura-trick","title":"樱 Trick","en":"Sakura Trick","year":2014,"studio":"Studio Deen","eps":12,"type":"TV","tags":["kiss","日常","浓度高"],"score":[6,6,7,10,6],"summary":"高坂与美月以接吻为日常的校园喜剧。浓度稳定输出的轻百合作。","verdict":"想纯看高浓度小动作、不想要任何心理负担，选它。"},{"id":"new-game","title":"New Game!","en":"New Game!","year":2016,"studio":"動画工房","eps":24,"type":"TV","tags":["职场","美术","治愈"],"score":[7,8,8,7,7],"summary":"游戏公司新人画师的职场日常，凉风与青叶的前后辈关系甜而不腻。","verdict":"职场轻百合天花板之一，治愈度满分。"},{"id":"gochiusa","title":"请问您今天要来点兔子吗？","en":"Gochuumon wa Usagi desu ka?","year":2014,"studio":"WHITE FOX","eps":36,"type":"TV","tags":["日常","咖啡","治愈"],"score":[7,7,8,6,8],"summary":"咖啡店少女们的慢节奏日常，智乃与心爱的身高差萌到犯规。","verdict":"放松身心的最优解，四季都能看。"},{"id":"yuyushiki","title":"YUYU式","en":"Yuyushiki","year":2013,"studio":"TYO Animations","eps":12,"type":"TV","tags":["日常","数据部","搞笑"],"score":[6,7,7,7,5],"summary":"三个女孩在「数据处理部」的脑洞日常。吐槽与黄色笑话齐飞。","verdict":"轻百合搞笑番，电波对得上就停不下来。"},{"id":"kiniro-mosaic","title":"黄金拼图","en":"Kiniro Mosaic","year":2013,"studio":"Studio五組","eps":24,"type":"TV","tags":["日常","金发","治愈"],"score":[7,7,8,6,7],"summary":"英国少女忍与日本少女们的校园日常，金发双马尾浓度高。","verdict":"视觉治愈系，阳子同学是灵魂。"},{"id":"hanayamata","title":"花舞少女","en":"Hanayamata","year":2014,"studio":"MADHOUSE","eps":12,"type":"TV","tags":["舞蹈","青春","成长"],"score":[7,7,7,6,5],"summary":"内向少女被夜来舞点燃，五色战队般的少女们一起向舞台进发。","verdict":"运动+百合的青春物语，感染力强。"},{"id":"denki-gai","title":"电器街的漫画店","en":"Denkigai no Honya-san","year":2014,"studio":"Brain's Base","eps":12,"type":"TV","tags":["职场","搞笑","二次元"],"score":[6,7,6,6,5],"summary":"漫画店员们的日常，各种腐宅梗与少女们的小心思。","verdict":"搞笑向轻百合，看个乐子很合适。"},{"id":"inugami-sisters","title":"犬神同学和猫山同学","en":"Inugami-san to Nekoyama-san","year":2014,"studio":"Seven","eps":12,"type":"TV","tags":["犬猫","日常","浓度高"],"score":[5,6,6,9,5],"summary":"犬系与猫系少女的冤家日常，每集五分钟的糖分炸弹。","verdict":"浓度极高的小品作，适合碎片时间。"},{"id":"ao-kanata","title":"苍之彼方的四重奏","en":"Aokana","year":2016,"studio":"GONZO","eps":12,"type":"TV","tags":["运动","天空","恋爱"],"score":[6,6,7,3,5],"summary":"天空竞技（飞行棋）题材，主线是男主与多女主。","verdict":"严格说不是百合，但女配线有百合味。"},{"id":"kanamemo","title":"加奈笔记","en":"Kanamemo","year":2009,"studio":"feel.","eps":13,"type":"TV","tags":["日常","新闻部","治愈"],"score":[6,7,6,7,5],"summary":"新闻部少女们的宿舍日常，大姐头与萝莉的搭配很经典。","verdict":"轻百合日常老番，氛围温馨。"},{"id":"slow-start","title":"Slow Start","en":"Slow Start","year":2018,"studio":"A-1 Pictures","eps":12,"type":"TV","tags":["日常","治愈","校园"],"score":[6,7,7,6,5],"summary":"重读高一的花名，与室友们的日常。四季主题，画风舒服。","verdict":"安稳的轻百合日常，芳文社风格。"},{"id":"comic-girls","title":"Comic Girls","en":"Comic Girls","year":2018,"studio":"Nexus","eps":12,"type":"TV","tags":["漫画家","同居","治愈"],"score":[7,7,7,6,6],"summary":"四位少女漫画家合住漫画公寓，互舔伤口的创作日常。","verdict":"少女们互相扶持的浓度很高，推荐。"},{"id":"harukana","title":"遥之彼方的接发球","en":"Harukana Receive","year":2018,"studio":"C2C","eps":12,"type":"TV","tags":["沙滩排球","运动","夏日"],"score":[7,7,8,7,6],"summary":"沙滩排球少女们的夏日群像，大空遥与比嘉彼方的互补搭档。","verdict":"阳光、运动、汗水和糖，性价比很高。"},{"id":"anima-yell","title":"Anima Yell!","en":"Anima Yell!","year":2018,"studio":"動画工房","eps":12,"type":"TV","tags":["啦啦队","运动","治愈"],"score":[6,6,7,7,5],"summary":"啦啦队少女们的日常，笨蛋三人组的热情四溢。","verdict":"轻百合运动番，元气满满。"},{"id":"release-spyce","title":"RELEASE THE SPYCE","en":"Release the Spyce","year":2018,"studio":"Lay-duce","eps":12,"type":"TV","tags":["间谍","动作","女高中生"],"score":[6,6,7,6,5],"summary":"女子高中生间谍组织「月之影」，忍者少女们的战斗。","verdict":"百合浓度中等的动作番，设定有趣。"},{"id":"happy-sugar-life","title":"Happy Sugar Life","en":"Happy Sugar Life","year":2018,"studio":"Ezóla","eps":12,"type":"TV","tags":["病娇","致郁","悬疑"],"score":[7,7,7,7,6],"summary":"少女砂糖对「小盐」的独占之爱，病娇百合的极致。","verdict":"三观炸裂但很好看，慎入。"},{"id":"dumbbell","title":"流汗吧！健身少女","en":"How Heavy Are the Dumbbells You Lift?","year":2019,"studio":"動画工房","eps":12,"type":"TV","tags":["健身","搞笑","女子"],"score":[6,6,7,4,6],"summary":"女子高中生健身日常，肌肉科普搞笑番。","verdict":"健身科普做得认真，轻百合氛围。"},{"id":"wataten","title":"天使降临到我身边","en":"Watashi ni Tenshi ga Maiorita!","year":2019,"studio":"動画工房","eps":13,"type":"TV","tags":["萝莉","治愈","日常"],"score":[6,6,8,7,7],"summary":"怕生的宫子学姐与小学生白咲花的互动，浓度偏高的小学生百合。","verdict":"被无数人奉为治愈神作，注意尺度。"},{"id":"hitori-bocchi","title":"一个人的○○小日子","en":"Hitori Bocchi no Marumaru Seikatsu","year":2019,"studio":"Lerche","eps":12,"type":"TV","tags":["社恐","日常","治愈"],"score":[7,7,7,6,6],"summary":"超级社恐的波知为了交到朋友而努力，与唯一好友的约定。","verdict":"社恐共鸣极强，轻百合治愈。"},{"id":"machikado","title":"街角魔族","en":"Machikado Mazoku","year":2019,"studio":"J.C.STAFF","eps":24,"type":"TV","tags":["魔族","日常","搞笑"],"score":[8,8,7,7,7],"summary":"贫穷魔族少女与魔法少女的相爱相杀，节奏绝佳的搞笑百合。","verdict":"近年最佳轻百合喜剧之一。"},{"id":"sounan","title":"你遭难了吗？","en":"Are You Lost?","year":2019,"studio":"Ezo'la","eps":12,"type":"TV","tags":["生存","女高中生"],"score":[6,6,7,4,5],"summary":"女子高中生荒岛求生，科普向。","verdict":"百合浓度低，但女孩子们的关系很可爱。"},{"id":"granbelm","title":"Granbelm","en":"Granbelm","year":2019,"studio":"Nexus","eps":13,"type":"TV","tags":["机战","魔法","致郁"],"score":[7,7,7,6,5],"summary":"满月与新月的机战对决，两位少女间的纠葛。","verdict":"被低估的机战百合，剧情有深度。"},{"id":"assault-lily","title":"Assault Lily Bouquet","en":"Assault Lily","year":2020,"studio":"SHAFT","eps":12,"type":"TV","tags":["战斗","学园","武器"],"score":[6,6,8,8,6],"summary":"少女们以枪械对抗巨大怪物的学园物语，搭档羁绊浓度高。","verdict":"战姬味很浓，CP配得很香。"},{"id":"d4dj","title":"D4DJ First Mix","en":"D4DJ","year":2020,"studio":"SANZIGEN","eps":13,"type":"TV","tags":["音乐","DJ","偶像"],"score":[6,6,8,6,6],"summary":"DJ少女们的音乐日常，全3DCG。","verdict":"邦邦同社作品，轻百合氛围。"},{"id":"pallete","title":"满溢的水果塔","en":"Ochikobore Fruit Tart","year":2020,"studio":"feel.","eps":12,"type":"TV","tags":["偶像","日常","搞笑"],"score":[6,6,7,6,5],"summary":"过气少女偶像团体再出发的日常喜剧。","verdict":"元气搞笑轻百合。"},{"id":"kandagawa","title":"神田川JET GIRLS","en":"Kandagawa Jet Girls","year":2019,"studio":"TNK","eps":12,"type":"TV","tags":["水上摩托","竞技"],"score":[5,5,7,7,5],"summary":"水上摩托竞速少女们，泳装浓度高。","verdict":"擦边向轻百合竞技番。"},{"id":"orchid-heart","title":"神推偶像登上武道馆我就死而无憾","en":"Oshi ga Budoukan Ittekuretara Shinu","year":2020,"studio":"8bit","eps":12,"type":"TV","tags":["偶像","追星","单恋"],"score":[8,8,7,8,7],"summary":"地下偶像与单推人的关系，狂热粉丝的百合心。","verdict":"追星文化刻画真实，浓度高且动人。"},{"id":"aku-no-jo","title":"魔女之旅","en":"Majo no Tabitabi","year":2020,"studio":"C2C","eps":12,"type":"TV","tags":["旅行","奇幻","单元"],"score":[7,7,8,3,7],"summary":"魔女伊蕾娜的旅行见闻，单元剧为主。","verdict":"百合浓度低，但世界观很美。"},{"id":"watashi-yuri","title":"百乃工 / 百合是我的工作！","en":"Watashi no Yuri wa Oshigoto desu!","year":2023,"studio":"Passione","eps":12,"type":"TV","tags":["咖啡店","营业百合","病娇"],"score":[7,8,7,8,6],"summary":"在咖啡店扮演「完美姐妹」的白鹭阳芽，遇到搅局的前好友美月。营业与真心之间的攻防战。","verdict":"喜欢美月这类角色的话浓度会相当顶。"},{"id":"sae","title":"佐伯沙弥香的追忆","en":"Saeki Sayaka ni Omakase","year":2020,"studio":"TROYCA","eps":1,"type":"OVA","tags":["外传","文学"],"score":[8,8,8,8,6],"summary":"终将成为你外传，补全佐伯沙弥香的独白。","verdict":"粉丝必看。"},{"id":"yuri-ko","title":"百合熊风暴","en":"Yurikuma Arashi","year":2015,"studio":"SILVER LINK","eps":12,"type":"TV","tags":["熊","象征","抽象"],"score":[8,8,7,8,6],"summary":"几原邦彦的百合寓言，熊与少女的残酷童话。","verdict":"象征主义百合，看懂后非常震撼。"},{"id":"flip-flappers","title":"FLIP FLAPPERS","en":"Flip Flappers","year":2016,"studio":"Studio 3Hz","eps":13,"type":"TV","tags":["奇幻","冒险","变身"],"score":[8,8,8,8,7],"summary":"两位少女穿越异世界「Pure Illusion」，寻找碎片。色彩绚丽的想象世界。","verdict":"被低估的奇幻百合，作画惊艳。"},{"id":"hugtto","title":"拥抱！光之美少女","en":"Hugtto! Precure","year":2018,"studio":"东映","eps":49,"type":"TV","tags":["光美","百合","单元"],"score":[7,7,8,6,6],"summary":"光之美少女系列，女性向的友情与羁绊。","verdict":"光美系列的百合味向来足。"},{"id":"futari-wa","title":"两人是光之美少女","en":"Futari wa Pretty Cure","year":2004,"studio":"东映","eps":49,"type":"TV","tags":["光美","经典"],"score":[7,7,7,5,7],"summary":"光之美少女开山作，两位少女的搭档。","verdict":"百合CP文化的源头之一。"},{"id":"magical-girl-site","title":"魔法少女网站","en":"Mahou Shoujo Site","year":2018,"studio":"production doA","eps":12,"type":"TV","tags":["魔法少女","致郁"],"score":[6,6,6,5,5],"summary":"黑暗魔法少女，女主与伙伴们的羁绊。","verdict":"致郁向，百合是暗线。"},{"id":"aria","title":"水星领航员","en":"Aria","year":2005,"studio":"HALFILM","eps":52,"type":"TV","tags":["治愈","经典","日常"],"score":[9,8,9,3,7],"summary":"火星威尼斯的水之都，领航员少女们的日常。","verdict":"不是百合但治愈到灵魂，值得一看。"},{"id":"hidamari","title":"向阳素描","en":"Hidamari Sketch","year":2007,"studio":"SHAFT","eps":48,"type":"TV","tags":["日常","美术","治愈"],"score":[8,7,8,5,6],"summary":"美术生少女们的宿舍日常，新房昭之的经典。","verdict":"轻百合治愈鼻祖之一。"},{"id":"girls-und-panzer","title":"少女与战车","en":"Girls und Panzer","year":2012,"studio":"Actas","eps":12,"type":"TV","tags":["战车","运动","学园"],"score":[8,7,8,5,8],"summary":"少女们驾驶战车的武道大会，西住美穗的成长。","verdict":"不是严格百合，但CP感很强，人气极高。"},{"id":"high-school-fleet","title":"高校舰队","en":"Haifuri","year":2016,"studio":"Production IMS","eps":12,"type":"TV","tags":["舰船","海洋","战斗"],"score":[7,7,8,5,6],"summary":"少女们驾驶军舰的海洋学园物语。","verdict":"百合浓度中等，舰队CP很好磕。"},{"id":"uma-musume","title":"赛马娘","en":"Uma Musume","year":2018,"studio":"P.A.WORKS","eps":39,"type":"TV","tags":["赛马","偶像","运动"],"score":[8,8,8,5,9],"summary":"马娘们的奔跑与梦想，特别周与无声铃鹿。","verdict":"人气极高，轻百合氛围浓厚。"},{"id":"uma-musume2","title":"赛马娘第二季","en":"Uma Musume S2","year":2021,"studio":"P.A.WORKS","eps":13,"type":"TV","tags":["赛马","催泪"],"score":[9,9,8,4,9],"summary":"东海帝王的复出之路，公认的神回。","verdict":"不是百合但情感浓度炸裂。"},{"id":"princess-principal","title":"Princess Principal","en":"Princess Principal","year":2017,"studio":"Studio 3Hz","eps":12,"type":"TV","tags":["间谍","蒸汽朋克","双女主"],"score":[8,8,8,8,7],"summary":"蒸汽朋克伦敦，两位少女间谍的搭档。安洁与多萝西。","verdict":"谍战+百合，安洁多萝西CP经典。"},{"id":"candy-boy","title":"Candy Boy","en":"Candy Boy","year":2008,"studio":"AIC","eps":8,"type":"OVA","tags":["双胞胎","校园"],"score":[7,7,7,8,5],"summary":"同卵双胞胎姐妹的亲密日常，尺度不小的校园百合。","verdict":"浓度很高的老牌百合OVA。"},{"id":"simoun","title":"Simoun","en":"Simoun","year":2006,"studio":"Studio Deen","eps":26,"type":"TV","tags":["科幻","成人","性转"],"score":[8,8,7,7,5],"summary":"驾驶Simoun的少女们，在成年时选择性别。","verdict":"设定独特的科幻百合，主题深刻。"},{"id":"mikagura","title":"御神乐学园组曲","en":"Mikagura Gakuen Kumikyoku","year":2015,"studio":"動画工房","eps":12,"type":"TV","tags":["学园","战斗","怪诞"],"score":[6,6,7,7,5],"summary":"御神乐学园的「部活」战斗，女主与美少女们的互动。","verdict":"搞怪+百合浓度中等的作品。"},{"id":"selector","title":"选择感染者WIXOSS","en":"Selector Infected WIXOSS","year":2014,"studio":"J.C.STAFF","eps":24,"type":"TV","tags":["卡牌","致郁","心理"],"score":[7,7,7,7,6],"summary":"卡片战斗的黑暗面，露子与少女们的纠缠。","verdict":"卡牌+致郁+百合，设定精巧。"},{"id":"strike-witches","title":"强袭魔女","en":"Strike Witches","year":2008,"studio":"GONZO","eps":36,"type":"TV","tags":["军事","魔女","战斗"],"score":[6,6,7,6,6],"summary":"魔女们以飞行脚对抗异形军。","verdict":"军事+百合，擦边浓度高。"},{"id":"vivid-strike","title":"Vivid Strike!","en":"Vivid Strike!","year":2016,"studio":"Seven Arcs","eps":12,"type":"TV","tags":["格斗","魔法少女"],"score":[6,6,7,7,5],"summary":"魔法少女奈叶系列衍生，拳拳到肉的格斗。","verdict":"奈叶系的百合浓度一直在线。"},{"id":"nanoha","title":"魔法少女奈叶","en":"Mahou Shoujo Lyrical Nanoha","year":2004,"studio":"Seven Arcs","eps":52,"type":"TV","tags":["魔法少女","战斗"],"score":[8,8,7,7,8],"summary":"奈叶与菲特的相遇，百合CP的经典。","verdict":"高达般的热血魔法少女，浓度高。"},{"id":"mai-hime","title":"舞-HiME","en":"Mai-HiME","year":2004,"studio":"SUNRISE","eps":26,"type":"TV","tags":["学园","战斗","致郁"],"score":[8,7,7,5,7],"summary":"少女们的「HiME」战斗，静留与夏树的羁绊。","verdict":"老牌百合向战斗番，静夏CP经典。"},{"id":"mai-otome","title":"舞-乙HiME","en":"Mai-Otome","year":2005,"studio":"SUNRISE","eps":26,"type":"TV","tags":["学园","战斗"],"score":[7,7,7,5,6],"summary":"舞-HiME续作，不同世界观。","verdict":"继续磕静夏CP的番外。"},{"id":"senki-zesshou","title":"战姬绝唱","en":"Senki Zesshou Symphogear","year":2012,"studio":"SATELIGHT","eps":52,"type":"TV","tags":["音乐","战斗","变身"],"score":[7,7,8,7,7],"summary":"唱歌变身的战姬少女们，翼与响的羁绊。","verdict":"战斗+音乐+百合，燃与甜并存。"},{"id":"k-on","title":"轻音少女","en":"K-On!","year":2009,"studio":"京都动画","eps":39,"type":"TV","tags":["音乐","日常","治愈"],"score":[8,8,8,6,9],"summary":"放学后Tea Time的轻音部，呆唯与梓喵。","verdict":"京阿尼的代表作，轻百合神作。"},{"id":"k-on-movie","title":"轻音少女剧场版","en":"K-On! Movie","year":2011,"studio":"京都动画","eps":1,"type":"剧场","tags":["音乐"],"score":[8,8,8,6,8],"summary":"轻音部毕业旅行伦敦篇。","verdict":"轻百合感动拉满。"},{"id":"girls-last-tour","title":"少女终末旅行","en":"Shoujo Shuumatsu Ryokou","year":2017,"studio":"WHITE FOX","eps":12,"type":"TV","tags":["末世","哲学","治愈"],"score":[9,8,8,6,8],"summary":"两位少女在末日废土上骑着履带车旅行。","verdict":"不是百合但两人的羁绊是全部。"},{"id":"school-live","title":"学园孤岛","en":"Gakkou Gurashi!","year":2015,"studio":"Lerche","eps":12,"type":"TV","tags":["丧尸","致郁","日常"],"score":[8,8,7,4,7],"summary":"少女们在丧尸世界的日常，前田玲奈。","verdict":"致郁治愈交织，浓度一般。"},{"id":"demons","title":"恶魔之谜","en":"Akuma no Riddle","year":2014,"studio":"Diomedea","eps":12,"type":"TV","tags":["暗杀","学园"],"score":[6,6,7,7,5],"summary":"暗杀者少女们的学园，一之濑晴与东兔角。","verdict":"百合浓度高的暗杀题材。"},{"id":"kaname","title":"此花亭奇谭","en":"Konohana Kitan","year":2017,"studio":"Lerche","eps":12,"type":"TV","tags":["狐娘","和风","治愈"],"score":[8,7,8,8,6],"summary":"狐娘们在温泉旅馆「此花亭」的温馨日常。","verdict":"和风治愈，百合浓度不低。"},{"id":"sora-yori","title":"比宇宙更远的地方","en":"Sora yori mo Tooi Basho","year":2018,"studio":"MADHOUSE","eps":13,"type":"TV","tags":["南极","青春","友情"],"score":[9,9,8,4,8],"summary":"四位少女的南极之旅，友情浓度拉满。","verdict":"不是百合但女性羁绊极动人。"},{"id":"kobayashi","title":"小林家的龙女仆","en":"Kobayashi-san Chi no Maid Dragon","year":2017,"studio":"京都动画","eps":26,"type":"TV","tags":["龙女仆","搞笑","治愈"],"score":[8,8,8,5,9],"summary":"程序员小林与龙女仆托尔的日常，京阿尼的招牌搞笑。","verdict":"百合浓度中等，人气爆棚。"},{"id":"maid-dragon2","title":"小林家的龙女仆S","en":"Kobayashi S","year":2021,"studio":"京都动画","eps":12,"type":"TV","tags":["搞笑"],"score":[8,8,8,5,8],"summary":"第二季，托尔与小林的关系继续升温。","verdict":"托尔与小林的日常更加温暖，京阿尼制作依然顶级。"},{"id":"kageki-shojo","title":"歌剧少女！！","en":"Kageki Shojo!!","year":2021,"studio":"Pine Jam","eps":13,"type":"TV","tags":["舞台","成长","学院"],"score":[9,9,8,7,6],"summary":"为偶像入学的更科进了最不可能进的红华歌剧学院，少女们的舞台欲望与姐妹情谊层层剥开。","verdict":"几乎零恋爱糖分，但充满互相托举的浓度，舞台作画极佳。"},{"id":"strawberry-panic","title":"惊爆草莓","en":"Strawberry Panic","year":2006,"studio":"MADHOUSE","eps":26,"type":"TV","tags":["学院","经典","浓度高"],"score":[7,7,7,9,7],"summary":"圣米雅托尔女学园的「草莓制度」，渚砂与静马的古典百合。","verdict":"真百合经典，浓度高，节奏慢。"},{"id":"blue-drop","title":"蓝花 / 蓝兰岛","en":"Blue Drop","year":2007,"studio":"Asread","eps":13,"type":"TV","tags":["科幻","致郁"],"score":[7,7,6,7,5],"summary":"人类少女与外星舰长少女的羁绊。","verdict":"冷门科幻百合，结局虐。"},{"id":"sasameki","title":"轻声密语","en":"Sasameki Koto","year":2009,"studio":"AIC","eps":13,"type":"TV","tags":["校园","单恋"],"score":[7,8,7,8,6],"summary":"喜欢青梅竹马的纯夏，对方却只对普通女生感兴趣。","verdict":"细腻的暗恋百合，心理描写很好。"},{"id":"aoi-hana","title":"青之花","en":"Aoi Hana","year":2009,"studio":"J.C.STAFF","eps":11,"type":"TV","tags":["校园","慢热"],"score":[8,8,7,8,7],"summary":"从小分离的青梅竹马在高中重逢，志摩与富美。","verdict":"细腻真实的百合，志摩线尤其好。"},{"id":"fate-illya","title":"魔法少女伊莉雅","en":"Fate/kaleid Prisma Illya","year":2013,"studio":"SILVER LINK","eps":52,"type":"TV","tags":["魔法少女","搞笑"],"score":[6,6,7,6,7],"summary":"伊莉雅与美游的魔法少女冒险，百合浓度中高。","verdict":"Fate系衍生的搞笑百合。"},{"id":"nanoha-vivid","title":"魔法少女奈叶vivid","en":"Nanoha ViVid","year":2015,"studio":"A-1 Pictures","eps":12,"type":"TV","tags":["格斗"],"score":[6,6,7,6,5],"summary":"奈叶系列第三部，以薇薇鸥为主角。","verdict":"薇薇鸥的成长物语，奈叶系粉丝向。"},{"id":"symphogear-axz","title":"战姬绝唱AXZ","en":"Symphogear AXZ","year":2017,"studio":"SATELIGHT","eps":13,"type":"TV","tags":["音乐","战斗"],"score":[7,7,8,7,7],"summary":"第四季，翼与玛利亚。","verdict":"翼与玛利亚的羁绊是最大看点，战斗作画优秀。"},{"id":"symphogear-xv","title":"战姬绝唱XV","en":"Symphogear XV","year":2019,"studio":"SATELIGHT","eps":13,"type":"TV","tags":["音乐","战斗"],"score":[7,7,8,7,7],"summary":"第五季，系列完结。","verdict":"系列完结篇，情感拉满，响与翼的最终舞台。"},{"id":"sypho-gear1","title":"战姬绝唱G","en":"Symphogear G","year":2013,"studio":"SATELIGHT","eps":13,"type":"TV","tags":["音乐"],"score":[7,7,8,7,7],"summary":"第二季，切歌登场。","verdict":"切歌登场带来新活力，系列承上启下之作。"},{"id":"sypho-gear2","title":"战姬绝唱GX","en":"Symphogear GX","year":2015,"studio":"SATELIGHT","eps":13,"type":"TV","tags":["音乐"],"score":[7,7,8,7,7],"summary":"第三季，响神觉醒。","verdict":"响神觉醒名场面，系列最高燃点之一。"},{"id":"kitakubu","title":"归宅部活动记录","en":"Kitakubu Katsudou Kiroku","year":2013,"studio":"NOMAD","eps":12,"type":"TV","tags":["日常","搞笑"],"score":[6,6,6,5,4],"summary":"归宅部少女们的脑洞日常。","verdict":"搞笑轻百合，电波向。"},{"id":"madoka-movie","title":"魔法少女小圆 剧场版 叛逆的物语","en":"Madoka Movie 3","year":2013,"studio":"SHAFT","eps":1,"type":"剧场","tags":["神作"],"score":[10,10,10,5,10],"summary":"晓美焰的叛逆物语。","verdict":"百合神作剧场版，焰的执念再度升华。"},{"id":"madoka-4","title":"魔法少女小圆 ワルプルギスの回天","en":"Madoka Movie 4","year":2025,"studio":"SHAFT","eps":1,"type":"剧场","tags":["神作","待映"],"score":[9,9,9,5,9],"summary":"圆与焰的最终章，2025年上映。","verdict":"万众期待的续篇，焰粉必看。"},{"id":"madoka-5","title":"魔法少女小圆 剧场版 起始","en":"Madoka Movie 1","year":2012,"studio":"SHAFT","eps":1,"type":"剧场","tags":["总集篇"],"score":[8,8,8,5,8],"summary":"TV总集篇。","verdict":"总集篇，适合回顾TV剧情。"},{"id":"madoka-6","title":"魔法少女小圆 剧场版 永恒","en":"Madoka Movie 2","year":2012,"studio":"SHAFT","eps":1,"type":"剧场","tags":["总集篇"],"score":[8,8,8,5,8],"summary":"TV总集篇。","verdict":"总集篇，补完焰视角的关键。"},{"id":"lyco-new","title":"Lycoris Recoil 剧场版","en":"Lycoris Recoil","year":2023,"studio":"A-1","eps":1,"type":"剧场","tags":["动作"],"score":[8,8,9,6,9],"summary":"千束与泷奈的延续。","verdict":"千束与泷奈的大银幕延续，动作戏依然流畅。"},{"id":"banrise","title":"BanG Dream! 第一季","en":"Bang Dream","year":2017,"studio":"ISSEN","eps":13,"type":"TV","tags":["乐队"],"score":[6,6,7,4,6],"summary":"香澄的乐队物语起点。","verdict":"香澄与Poppin'Party的起点，邦邦世界观基石。"},{"id":"koi-wo-shinu","title":"与妳相恋到生命尽头","en":"Kimi ga Shinu made Koi wo Shitai","year":2025,"studio":"Bakken Record","eps":13,"type":"TV","tags":["战争","悲剧","直球"],"score":[7,8,8,8,7],"summary":"在死与死的战场上，少年兵少女们的残酷恋爱。2025年7月开播。","verdict":"直球浓度与悲剧并存，战地百合。"},{"id":"koibito-muri","title":"我们不可能成为恋人！绝对不行","en":"Watashi ga Koibito ni Nareru Wake Nai jan","year":2025,"studio":"J.C.STAFF","eps":12,"type":"TV","tags":["恋爱","喜剧","直球"],"score":[7,7,7,8,8],"summary":"拒绝恋爱宣言却在误会中与同桌越走越近的爆笑直球百合。2025年7月开播。","verdict":"轻松搞笑，浓度高，人气黑马。"},{"id":"hiro-no-kao","title":"想吃掉我的非人少女","en":"Kowarekake no Orgel","year":2025,"studio":"Studio Lings","eps":13,"type":"TV","tags":["人外","治愈","直球"],"score":[8,8,8,8,7],"summary":"少女与想吃掉自己的「怪物」之间的温暖日常，2025年10月开播。","verdict":"治愈系直球百合，口碑新作。"},{"id":"kamiina-botan","title":"醉态是百合之花 / 上井草牡丹","en":"Kamiina Botan","year":2026,"studio":"—","eps":12,"type":"TV","tags":["醉态","直球"],"score":[7,7,7,8,6],"summary":"2026年春季开播的新作，少女醉酒后的百合展开。","verdict":"待播新作，值得关注。"},{"id":"android-virgin","title":"与仿生人初体验算数吗？","en":"Android wa Keiken Ninzuu","year":2026,"studio":"—","eps":12,"type":"TV","tags":["科幻","直球"],"score":[6,6,7,8,6],"summary":"2026年改编动画化的科幻百合。","verdict":"科幻百合新作，设定有趣，值得期待。"},{"id":"kaya-chan","title":"Kaya-chan wa Kowakunai","en":"Kaya-chan wa Kowakunai","year":2026,"studio":"—","eps":12,"type":"TV","tags":["恐怖","日常","搞笑"],"score":[6,6,7,5,5],"summary":"幼儿园小孩卡娅完全不害怕任何恐怖事物，反而让大人胆寒的恐怖喜剧。2026年冬季新番。","verdict":"新作恐怖喜剧，看个轻松与反差萌。"},{"id":"kannazuki","title":"神无月的巫女","en":"Kannazuki no Miko","year":2004,"studio":"TNK","eps":12,"type":"TV","tags":["经典","神代","直球","致郁"],"score":[7,7,7,9,7],"summary":"姬宫千歌音与来栖川姬子被神无月的神话选中。千歌音为了所爱甘愿成为恶役。","verdict":"真百合开山作之一，千歌音的牺牲令人心碎。"},{"id":"whisper-me","title":"恋语轻唱","en":"Whisper Me a Love Song","year":2024,"studio":"Cloud Hearts","eps":12,"type":"TV","tags":["乐队","直球","校园"],"score":[8,8,8,9,7],"summary":"主唱依与学妹木乃香的直球恋歌，乐队少女的青春。2024年新番。","verdict":"直球浓度拉满的乐队百合，歌也很好听。"},{"id":"oshi-akuyaku","title":"我推是反派大小姐","en":"Watashi no Oshi wa Akuyaku Reijou","year":2023,"studio":"Platinum Vision","eps":12,"type":"TV","tags":["转生","乙女","直球"],"score":[7,7,7,9,7],"summary":"转生到乙女游戏的女主，爱上了反派大小姐蕾。","verdict":"转生百合代表作，浓度高且真诚。"},{"id":"revue-starlight","title":"少女☆歌剧 Revue Starlight","en":"Shoujo Kageki Revue Starlight","year":2018,"studio":"Kinema Citrus","eps":12,"type":"TV","tags":["舞台","战斗","选拔"],"score":[8,8,8,8,7],"summary":"舞台少女们为了「Top Star」之位互相争夺。恋与光的羁绊贯穿全剧。","verdict":"演出炸裂的舞台百合，华恋光的浓度极高。"},{"id":"liz-to-aoitori","title":"莉兹与青鸟","en":"Liz to Aoi Tori","year":2018,"studio":"京都动画","eps":1,"type":"剧场","tags":["音乐","文学","电影"],"score":[9,9,9,9,8],"summary":"吹响吧上低音号外传，伞木希美与铠冢霙的「鸟与少女」童话互文。","verdict":"近年最美的百合剧场版，细腻到骨子里。"},{"id":"hibike","title":"吹响吧！上低音号","en":"Hibike! Euphonium","year":2015,"studio":"京都动画","eps":26,"type":"TV","tags":["音乐","青春","社团"],"score":[8,8,8,8,8],"summary":"北宇治高中吹奏乐部，久美子与丽奈的「特别的相遇」。","verdict":"久丽浓度之高让无数人入坑。"},{"id":"gokigen","title":"高校舰队 剧场版","en":"High School Fleet Movie","year":2020,"studio":"Production IMS","eps":1,"type":"剧场","tags":["舰船","海洋"],"score":[7,7,8,5,6],"summary":"剧场版继续晴风号的冒险。","verdict":"晴风号的大银幕冒险，舰队CP粉必看。"},{"id":"mou-ippon","title":"再得一胜！","en":"Mou Ippon!","year":2023,"studio":"Bakken Record","eps":13,"type":"TV","tags":["柔道","运动"],"score":[7,7,7,5,5],"summary":"女子柔道部的少女们，友情与竞技。","verdict":"体育系轻百合，热血与甜并存。"},{"id":"wonder-egg","title":"奇蛋物语","en":"Wonder Egg Priority","year":2021,"studio":"CloverWorks","eps":12,"type":"TV","tags":["致郁","心理","原创"],"score":[8,8,8,6,7],"summary":"少女们在梦中与「怪童」战斗，赎罪与自我救赎。AI少女与主角的羁绊。","verdict":"画面精美、议题大胆，百合是暗线但动人。"},{"id":"neighbor-vampire","title":"邻家的吸血鬼小妹","en":"Tonari no Kyuuketsuki-san","year":2018,"studio":"動画工房","eps":12,"type":"TV","tags":["日常","吸血鬼","治愈"],"score":[6,6,7,6,5],"summary":"人类少女与吸血鬼室友的同居日常。","verdict":"安稳的轻百合日常，萌系。"},{"id":"sora-no-woto","title":"空之音","en":"So Ra No Wo To","year":2010,"studio":"A-1 Pictures","eps":13,"type":"TV","tags":["军事","日常","治愈"],"score":[7,7,8,5,5],"summary":"少女士兵在边陲小镇吹小号，战后的宁静日常。","verdict":"冷门治愈番，氛围极佳。"},{"id":"zombie-land","title":"佐贺偶像是传奇","en":"Zombie Land Saga","year":2018,"studio":"MAPPA","eps":24,"type":"TV","tags":["偶像","僵尸","搞笑"],"score":[8,7,8,5,7],"summary":"僵尸少女们组成偶像团体振兴佐贺。","verdict":"元气搞笑+催泪，轻百合氛围。"},{"id":"valkyrie-drive","title":"女武神驱动","en":"Valkyrie Drive","year":2015,"studio":"Arms","eps":12,"type":"TV","tags":["擦边","动作","变身"],"score":[5,5,6,8,5],"summary":"少女们的「ARM」觉醒战斗，擦边浓度极高。","verdict":"肉番向百合，战斗很燃。"},{"id":"koisuru-asteroid","title":"恋爱小行星","en":"Koisuru Asteroid","year":2020,"studio":"動画工房","eps":12,"type":"TV","tags":["天文","社团","治愈"],"score":[7,7,7,7,6],"summary":"天文社与地质社少女们寻找小行星。","verdict":"芳文社招牌，星之梦很浪漫。"},{"id":"tama-yomi","title":"球咏","en":"Tama-yomi","year":2020,"studio":"SynergySP","eps":12,"type":"TV","tags":["垒球","运动"],"score":[6,6,7,6,5],"summary":"女子垒球部的青春物语。","verdict":"运动轻百合。"},{"id":"houkago-pleiades","title":"放课后昴星团","en":"Houkago no Pleiades","year":2015,"studio":"GAINAX","eps":12,"type":"TV","tags":["魔法少女","原创"],"score":[6,6,7,6,5],"summary":"少女们乘着魔女扫帚收集碎片。","verdict":"魔法少女轻百合。"},{"id":"chio-chan","title":"千绪的通学路","en":"Chio-chan no Tsuugakuro","year":2018,"studio":"Diomedea","eps":12,"type":"TV","tags":["搞笑","校园"],"score":[6,6,7,4,5],"summary":"普通女高中生的脑洞上学路。","verdict":"搞笑向，轻百合点缀。"},{"id":"joshiraku","title":"女子落语","en":"Joshiraku","year":2012,"studio":"J.C.STAFF","eps":13,"type":"TV","tags":["落语","搞笑"],"score":[7,7,6,5,5],"summary":"落语少女们的后台闲聊。","verdict":"电波系搞笑，百合味清淡。"},{"id":"mitsuboshi","title":"三颗星彩色冒险","en":"Mitsuboshi Colors","year":2018,"studio":"SILVER LINK","eps":12,"type":"TV","tags":["日常","幼女","治愈"],"score":[7,6,7,4,5],"summary":"小学女生三人组的城市冒险。","verdict":"清新治愈。"},{"id":"tamayura","title":"玉响","en":"Tamayura","year":2010,"studio":"TYO Animations","eps":12,"type":"TV","tags":["治愈","摄影","日常"],"score":[7,7,7,4,4],"summary":"少女用相机记录小镇日常。","verdict":"治愈系轻百合。"},{"id":"world-dai-star","title":"世界大明星","en":"World Dai Star","year":2023,"studio":"Lerche","eps":12,"type":"TV","tags":["舞台","偶像","成长"],"score":[7,7,8,7,6],"summary":"舞台少女们追逐「世界大明星」的称号，心菜的执念。","verdict":"舞台百合新作，心菜与静的羁绊很香。"},{"id":"jinrui","title":"人类衰退之后","en":"Jinrui wa Suitai Shimashita","year":2012,"studio":"AIC A.S.T.A.","eps":13,"type":"TV","tags":["黑色幽默","科幻"],"score":[8,7,7,3,5],"summary":"人类衰退后的世界，妖精与人类小姐的日常。","verdict":"电波治愈番。"},{"id":"non-non-biyori","title":"悠哉日常大王","en":"Non Non Biyori","year":2013,"studio":"SILVER LINK","eps":36,"type":"TV","tags":["乡村","治愈","日常"],"score":[8,7,8,4,7],"summary":"乡下学校少女们的日常，「喵帕斯」的传说。","verdict":"治愈神作，轻百合氛围。"},{"id":"cardcaptor","title":"库洛魔法使","en":"Cardcaptor Sakura","year":1998,"studio":"MADHOUSE","eps":70,"type":"TV","tags":["经典","魔法少女","童年"],"score":[8,8,8,6,8],"summary":"小樱的收卡冒险，知世对小樱的守护与拍摄之爱。","verdict":"知世线是无数人最初的百合启蒙。"},{"id":"rayearth","title":"魔法骑士雷阿斯","en":"Magic Knight Rayearth","year":1994,"studio":"TMS","eps":20,"type":"TV","tags":["经典","奇幻","CLAMP"],"score":[7,7,8,5,6],"summary":"三位少女被召唤到塞费罗，成为魔法骑士。","verdict":"CLAMP早期的少女群像，光海风的羁绊。"},{"id":"sailor-moon","title":"美少女战士","en":"Sailor Moon","year":1992,"studio":"东映","eps":200,"type":"TV","tags":["经典","魔法少女"],"score":[8,7,8,6,8],"summary":"水手战士们的爱与正义，天王遥与海王满的CP。","verdict":"百合CP文化的经典。"},{"id":"battle-athletes","title":"大运动会","en":"Battle Athletes Victory","year":1997,"studio":"AIC","eps":26,"type":"TV","tags":["运动","经典"],"score":[6,6,7,7,5],"summary":"宇宙运动会，少女们的竞技与羁绊。","verdict":"老牌百合运动番。"},{"id":"queens-blade","title":"女皇之刃","en":"Queen's Blade","year":2009,"studio":"Arms","eps":24,"type":"TV","tags":["擦边","战斗"],"score":[5,5,6,7,5],"summary":"女性战士们的战斗大会，擦边浓度高。","verdict":"肉番向百合。"},{"id":"gakuen-alice","title":"学园爱丽丝","en":"Gakuen Alice","year":2004,"studio":"Group Tac","eps":26,"type":"TV","tags":["学园","能力"],"score":[7,7,7,5,5],"summary":"拥有特殊能力的孩子们在学园，蜜柑与枣。","verdict":"童年番，百合线清淡。"},{"id":"lovelive","title":"LoveLive!","en":"Love Live!","year":2013,"studio":"SUNRISE","eps":39,"type":"TV","tags":["偶像","校园","人气"],"score":[8,7,8,6,9],"summary":"拯救废校的校园偶像企划，穗乃果与绘里的羁绊。","verdict":"偶像番轻百合的标杆。"},{"id":"lovelive-sunshine","title":"LoveLive! Sunshine!!","en":"Love Live! Sunshine!!","year":2016,"studio":"SUNRISE","eps":26,"type":"TV","tags":["偶像","校园"],"score":[7,7,8,6,7],"summary":"浦之星女学院的偶像，千歌的梦想。","verdict":"千歌与曜的浦之星物语，偶像番中百合味较浓。"},{"id":"lovelive-superstar","title":"LoveLive! Superstar!!","en":"Love Live! Superstar!!","year":2021,"studio":"SUNRISE","eps":36,"type":"TV","tags":["偶像","校园"],"score":[7,7,8,6,7],"summary":"结丘女学院的五名成员。","verdict":"结丘女学院的新篇章，澪与香音的羁绊动人。"},{"id":"idoly-pride","title":"偶像荣耀","en":"Idoly Pride","year":2021,"studio":"Lerche","eps":12,"type":"TV","tags":["偶像","音乐"],"score":[7,7,8,5,5],"summary":"偶像经纪公司与少女们的梦想。","verdict":"音乐与偶像题材，轻百合氛围。"},{"id":"idolmaster","title":"偶像大师","en":"THE IDOLM@STER","year":2011,"studio":"A-1 Pictures","eps":25,"type":"TV","tags":["偶像"],"score":[7,7,8,4,7],"summary":"765事务所的偶像们。","verdict":"偶像番经典，轻百合点缀。"},{"id":"aikatsu","title":"偶像活动","en":"Aikatsu!","year":2012,"studio":"SUNRISE","eps":50,"type":"TV","tags":["偶像","童年"],"score":[6,6,7,5,6],"summary":"偶像育成学校，星宫莓的成长。","verdict":"童年偶像番，轻百合氛围。"},{"id":"pripara","title":"星光乐园","en":"PriPara","year":2014,"studio":"龙之子","eps":50,"type":"TV","tags":["偶像","童年"],"score":[6,6,7,5,6],"summary":"少女们进入星光乐园的偶像活动。","verdict":"偶像童年番，轻松有趣。"},{"id":"doki-precure","title":"心跳！光之美少女","en":"DokiDoki! Precure","year":2013,"studio":"东映","eps":49,"type":"TV","tags":["光美","浓度高"],"score":[7,7,8,7,6],"summary":"相田爱与剑崎真琴的搭档，雷吉娜的执念。","verdict":"光美里百合浓度极高的一部。"},{"id":"smile-precure","title":"Smile光之美少女","en":"Smile! Precure","year":2012,"studio":"东映","eps":48,"type":"TV","tags":["光美"],"score":[7,7,8,5,6],"summary":"五位光美少女的故事。","verdict":"光美系列，百合味一直在线。"},{"id":"mahotsukai-precure","title":"魔法使光之美少女","en":"Maho Girls Precure","year":2016,"studio":"东映","eps":50,"type":"TV","tags":["光美","魔法"],"score":[7,7,8,6,6],"summary":"魔法使光美，理子与未来。","verdict":"理子与未来的搭档感很强，光美中浓度较高。"},{"id":"kancolle","title":"舰队Collection","en":"KanColle","year":2015,"studio":"Diomedea","eps":12,"type":"TV","tags":["舰娘","军事"],"score":[6,6,7,6,6],"summary":"舰娘们的镇守府日常与战斗，吹雪与睦月。","verdict":"舰娘百合，长门陆奥CP经典。"},{"id":"azur-lane","title":"碧蓝航线","en":"Azur Lane","year":2019,"studio":"Bibury","eps":12,"type":"TV","tags":["舰娘","战斗"],"score":[6,6,7,6,5],"summary":"阵营对抗中的舰娘们。","verdict":"游戏改编，舰娘CP可磕。"},{"id":"lucky-star","title":"幸运星","en":"Lucky Star","year":2007,"studio":"京都动画","eps":24,"type":"TV","tags":["日常","搞笑","经典"],"score":[7,7,7,5,7],"summary":"此方与朋友们的中学生活，宅梗与吐槽。","verdict":"京阿尼轻百合日常鼻祖。"},{"id":"ichigo-mashimaro","title":"草莓棉花糖","en":"Ichigo Mashimaro","year":2005,"studio":"Daume","eps":12,"type":"TV","tags":["萝莉","日常","治愈"],"score":[7,7,7,5,6],"summary":"姐姐们与小学生们的日常。","verdict":"治愈系，尺度微妙。"},{"id":"azumanga","title":"阿滋漫画大王","en":"Azumanga Daioh","year":2002,"studio":"J.C.STAFF","eps":26,"type":"TV","tags":["日常","搞笑","经典"],"score":[8,7,7,4,6],"summary":"女子高中生们的校园日常，大阪的脱线。","verdict":"经典轻百合，电波对得上就是神作。"},{"id":"nichijou","title":"日常","en":"Nichijou","year":2011,"studio":"京都动画","eps":26,"type":"TV","tags":["日常","搞笑"],"score":[8,7,8,4,7],"summary":"女高中生与机器人少女的日常。","verdict":"京阿尼搞笑巅峰。"},{"id":"mikakunin","title":"未确认进行式","en":"Mikakunin de Shinkoukei","year":2014,"studio":"動画工房","eps":12,"type":"TV","tags":["日常","未婚妻"],"score":[6,6,7,5,5],"summary":"小红的未婚夫竟然是白丝少女？","verdict":"轻百合日常。"},{"id":"sabagebu","title":"生存游戏社","en":"Sabagebu!","year":2014,"studio":"Production IMS","eps":12,"type":"TV","tags":["生存游戏","搞笑"],"score":[6,6,7,5,4],"summary":"女子高中生生存游戏部。","verdict":"搞笑轻百合。"},{"id":"yama-no-susume","title":"前进吧！登山少女","en":"Yama no Susume","year":2013,"studio":"8bit","eps":26,"type":"TV","tags":["登山","治愈"],"score":[7,7,7,5,5],"summary":"少女们的登山日常。","verdict":"治愈轻百合，四季更迭很美。"},{"id":"bofuri","title":"因为太怕痛就全点防御力了","en":"Bofuri","year":2020,"studio":"SILVER LINK","eps":24,"type":"TV","tags":["游戏","异世界"],"score":[6,6,7,5,6],"summary":"梅普露与莎莉的VRMMO冒险。","verdict":"轻百合浓度不错，枫梨CP很香。"},{"id":"gabriel","title":"加百列的堕落","en":"Gabriel DropOut","year":2017,"studio":"動画工房","eps":12,"type":"TV","tags":["天使","恶魔","搞笑"],"score":[6,6,7,5,6],"summary":"堕天使加百列的宅日常。","verdict":"搞笑轻百合。"},{"id":"aho-girl","title":"笨女孩","en":"Aho Girl","year":2017,"studio":"Diomedea","eps":12,"type":"TV","tags":["搞笑","日常"],"score":[5,5,6,3,5],"summary":"笨蛋花畑佳子的日常。","verdict":"搞笑番，轻百合点缀。"},{"id":"working","title":"迷糊餐厅","en":"Working!!","year":2010,"studio":"A-1 Pictures","eps":39,"type":"TV","tags":["职场","搞笑"],"score":[7,7,7,4,6],"summary":"家庭餐厅的店员们，小鸟游与伊波。","verdict":"职场轻喜剧，百合线清淡。"},{"id":"yuki-yuna","title":"结城友奈是勇者","en":"Yuuki Yuuna wa Yuusha de Aru","year":2014,"studio":"Studio五組","eps":12,"type":"TV","tags":["致郁","勇者","战斗"],"score":[8,8,8,7,7],"summary":"勇者部的少女们对抗Vertex，代价残酷。东乡与友奈的羁绊。","verdict":"致郁百合，浓度和刀子并存。"},{"id":"washi-usa","title":"结城友奈是勇者 鹫尾须美之章","en":"Yuki Yuna: Washio Sumi no Shou","year":2017,"studio":"Studio五組","eps":6,"type":"剧场","tags":["致郁"],"score":[7,7,7,6,6],"summary":"前传，鹫尾须美的故事。","verdict":"前传外传，刀子不少，勇者部粉丝必看。"},{"id":"sora-method","title":"天体的秩序","en":"Sora no Method","year":2014,"studio":"動画工房","eps":13,"type":"TV","tags":["日常","奇幻"],"score":[6,6,7,4,4],"summary":"少女与「久地绪」的约定。","verdict":"治愈轻百合。"},{"id":"natsuiro-kiseki","title":"夏色奇迹","en":"Natsuiro Kiseki","year":2012,"studio":"SUNRISE","eps":12,"type":"TV","tags":["日常","奇幻"],"score":[6,6,7,4,5],"summary":"四位少女的夏日奇迹。","verdict":"夏日青春群像，四位少女的羁绊很美。"},{"id":"utena-movie","title":"少女革命 剧场版 思春期默示录","en":"Utena Movie","year":1999,"studio":"J.C.STAFF","eps":1,"type":"剧场","tags":["经典","象征"],"score":[9,9,8,6,6],"summary":"TV的平行世界再演绎，更直白的安希与欧蒂娜。","verdict":"剧场版比TV更拥抱彼此。"},{"id":"wataten-movie","title":"天使降临到我身边 剧场版","en":"Wataten Movie","year":2022,"studio":"動画工房","eps":1,"type":"剧场","tags":["治愈"],"score":[6,6,8,7,7],"summary":"白咲花与宫子的夏日合宿。","verdict":"粉丝向治愈剧场版。"},{"id":"yuru-camp-movie","title":"摇曳露营△ 剧场版","en":"Yuru Camp Movie","year":2022,"studio":"C-Station","eps":1,"type":"剧场","tags":["露营","治愈"],"score":[8,8,8,4,7],"summary":"长大后的露营部少女们的再会。","verdict":"成长与重逢的治愈剧场版，凛与抚子继续发光。"},{"id":"revue-movie","title":"少女歌剧 剧场版","en":"Revue Starlight Movie","year":2020,"studio":"Kinema Citrus","eps":1,"type":"剧场","tags":["舞台"],"score":[9,9,9,8,7],"summary":"毕业的舞台少女们最后的revue。","verdict":"剧场版口碑超越TV，华恋光的结局动人。"},{"id":"gu-pan-movie","title":"少女与战车 最终章","en":"Girls und Panzer das Finale","year":2019,"studio":"Actas","eps":6,"type":"剧场","tags":["战车","运动"],"score":[8,7,8,5,7],"summary":"大洗少女们的最终战。","verdict":"最终章六部作，战车戏依然精彩，CP感满满。"},{"id":"ga-rei-zero","title":"食灵·零","en":"Ga-Rei: Zero","year":2008,"studio":"AIC","eps":12,"type":"TV","tags":["致郁","战斗","姐妹"],"score":[8,8,7,9,6],"summary":"黄泉与神乐的姐妹羁绊，悲剧的极致。","verdict":"动画原创前半是神回，黄泉的告白令人难忘。"},{"id":"magia-record","title":"魔法纪录","en":"Magia Record","year":2020,"studio":"SHAFT","eps":26,"type":"TV","tags":["魔法少女","致郁"],"score":[7,7,8,7,6],"summary":"魔圆外传，环彩羽寻找妹妹。","verdict":"魔圆世界观延伸，环彩羽与美树的羁绊动人。"},{"id":"mahou-ikusei","title":"魔法少女育成计划","en":"Mahou Shoujo Ikusei Keikaku","year":2016,"studio":"Lerche","eps":12,"type":"TV","tags":["致郁","魔法少女"],"score":[6,6,7,6,5],"summary":"十六名魔法少女的生存竞争。","verdict":"致郁向。"},{"id":"akebi","title":"明日酱的水手服","en":"Akebi-chan no Sailor-fuku","year":2022,"studio":"CloverWorks","eps":12,"type":"TV","tags":["女校","日常"],"score":[8,7,8,7,6],"summary":"明日小路在女校的青春，全女阵容。","verdict":"画面精美，女校百合氛围浓郁。"},{"id":"hanebado","title":"轻羽飞扬","en":"Hanebado!","year":2018,"studio":"LIDENFILMS","eps":13,"type":"TV","tags":["羽毛球","运动"],"score":[7,7,7,5,5],"summary":"羽毛球少女们的心理战，绫乃与渚。","verdict":"运动百合，心理描写尖锐。"},{"id":"slime-300","title":"打了300年的史莱姆","en":"Slime 300","year":2021,"studio":"REVOROOT","eps":12,"type":"TV","tags":["异世界","日常"],"score":[6,6,7,6,5],"summary":"最强魔女与同居少女们的日常。","verdict":"轻松异世界轻百合。"},{"id":"uma-musume3","title":"赛马娘 第三季","en":"Uma Musume S3","year":2023,"studio":"P.A.WORKS","eps":13,"type":"TV","tags":["赛马"],"score":[8,8,8,4,8],"summary":"北村黑子的梦想。","verdict":"第三季继续热血与感动，赛马娘IP核心。"},{"id":"yama-ai","title":"山田与加濑同学","en":"Yamada to Kase-san","year":2017,"studio":"Zexcs","eps":1,"type":"OVA","tags":["校园","直球","短篇"],"score":[7,7,7,9,5],"summary":"田径部的山田与园艺部的加濑，青涩而直球的校园恋曲。","verdict":"短小但甜度爆炸，直球百合的经典OVA。"},{"id":"kase-san2","title":"加濑同学系列 剧场版","en":"Kase-san and Morning Glories","year":2018,"studio":"Zexcs","eps":1,"type":"剧场","tags":["校园","直球"],"score":[7,7,7,9,5],"summary":"山田与加濑的大学生活前夜。","verdict":"粉丝向剧场版，延续直球甜度。"},{"id":"asagao","title":"牵牛花与加濑同学","en":"Asagao to Kase-san","year":2018,"studio":"Zexcs","eps":1,"type":"剧场","tags":["校园","直球"],"score":[7,7,7,9,5],"summary":"OVA合集加新内容的剧场版。","verdict":"山田与加濑的甜度不减，直球百合粉丝向。"},{"id":"nettaigyo","title":"热带鱼是冬天的梦想","en":"Nettaigyo wa Yami ni Saku","year":2019,"studio":"Lerche","eps":12,"type":"TV","tags":["社团","慢热","文学"],"score":[7,8,7,8,5],"summary":"水族社的夏深与小雪，别扭而真挚的靠近。","verdict":"细腻的慢热百合，可惜只有一季。"},{"id":"girlish-number","title":"少女编号","en":"Gi(a)rlish Number","year":2016,"studio":"Diomedea","eps":12,"type":"TV","tags":["声优","职场"],"score":[7,7,7,3,5],"summary":"新人声优千岁的职场日常，略带毒舌的吐槽。","verdict":"声优业界吐槽番，轻百合点缀。"},{"id":"rolling-girls","title":"旋转少女","en":"Rolling Girls","year":2015,"studio":"WIT Studio","eps":12,"type":"TV","tags":["公路","热血"],"score":[7,7,8,5,5],"summary":"四人组的公路之旅。","verdict":"WIT Studio的原创公路番，少女们的情谊动人。"},{"id":"koufuku","title":"幸腹涂鸦","en":"Koufuku Graffiti","year":2015,"studio":"SHAFT","eps":12,"type":"TV","tags":["美食","治愈"],"score":[7,7,7,5,5],"summary":"料理少女的温馨日常，吃出感情。","verdict":"美食+轻百合，SHAFT味十足。"},{"id":"yuuki-yuna-3","title":"结城友奈是勇者 大满开之章","en":"Yuuki Yuuna S3","year":2021,"studio":"Studio五組","eps":12,"type":"TV","tags":["致郁","勇者"],"score":[7,7,7,7,6],"summary":"大满开之章，友奈与东乡的最终篇章。","verdict":"友奈与东乡的最终篇章，感情戏拉满。"},{"id":"houkago-teibou","title":"放学后海堤日记","en":"Houkago Teibou Nisshi","year":2020,"studio":"動画工房","eps":12,"type":"TV","tags":["钓鱼","日常"],"score":[6,6,7,5,5],"summary":"少女们的海堤钓鱼部，自然科普与日常。","verdict":"钓鱼科普+少女日常，安稳治愈。"},{"id":"sound-euphonium","title":"吹响吧上低音号 久美子篇","en":"Hibike! Movie","year":2019,"studio":"京都动画","eps":1,"type":"剧场","tags":["音乐"],"score":[8,8,8,8,8],"summary":"久美子与丽奈的关系，在总集篇与剧场版中愈发清晰。","verdict":"久丽线的集大成，粉丝向剧场版。"},{"id":"glassy","title":"玻璃地球?","en":"Glass no Hana to Kowasu Sekai","year":2016,"studio":"A-1 Pictures","eps":1,"type":"剧场","tags":["科幻","短篇"],"score":[6,6,7,5,4],"summary":"少女们在虚幻世界的相遇。","verdict":"冷门科幻剧场版，画面唯美。"},{"id":"onipan","title":"鬼裤","en":"Onipan!","year":2022,"studio":"WIT Studio","eps":12,"type":"TV","tags":["日常","短篇"],"score":[6,6,7,5,4],"summary":"鬼少女们的日常短篇。","verdict":"WIT Studio的轻松日常短篇，鬼少女很萌。"},{"id":"bocchi-rock","title":"孤独摇滚！","en":"Bocchi the Rock!","year":2022,"studio":"CloverWorks","eps":12,"type":"TV","tags":["乐队","社恐","音乐"],"score":[9,9,8,5,9],"summary":"社恐后藤一里在乐队的成长，虹夏与喜多的羁绊。","verdict":"虽然主打社恐搞笑，但女性乐队的浓度意外地高。"},{"id":"bocchi-movie","title":"孤独摇滚 剧场版","en":"Bocchi the Rock! Movie","year":2024,"studio":"CloverWorks","eps":1,"type":"剧场","tags":["乐队"],"score":[8,8,8,5,8],"summary":"TV总集篇加新内容。","verdict":"TV总集篇加新内容，波奇的成长物语。"},{"id":"k-on-2","title":"轻音少女 第二季","en":"K-On!!","year":2010,"studio":"京都动画","eps":26,"type":"TV","tags":["音乐","日常"],"score":[8,8,8,6,9],"summary":"轻音部第二季，毕业与泪水。","verdict":"毕业与泪水，轻音部最感人的篇章。"},{"id":"yuru-camp","title":"摇曳露营△","en":"Yuru Camp","year":2018,"studio":"C-Station","eps":38,"type":"TV","tags":["露营","治愈","美食"],"score":[8,8,8,4,8],"summary":"女子高中生们的露营日常，凛与抚子的温暖相遇。","verdict":"治愈系代表，轻百合浓度恰到好处。"},{"id":"adachi-shimamura","title":"安达与岛村","en":"Adachi to Shimamura","year":2020,"studio":"Tezuka Productions","eps":12,"type":"TV","tags":["慢热","文学","心理"],"score":[8,8,7,9,7],"summary":"逃课少女安达与岛村在体育馆二楼的相遇，别扭而温暖的日常。","verdict":"慢热但后劲十足，入江麻美的小说改编。"},{"id":"shoujo-sect","title":"少女セクト","en":"Shoujo Sect","year":2008,"studio":"Amber Film Works","eps":3,"type":"OVA","tags":["成人","浓度高"],"score":[5,5,5,10,3],"summary":"成人向百合OVA，尺度极大。","verdict":"成人向作品，仅作目录收录。"},{"id":"kuma-kuma","title":"熊妹","en":"Kuma Kuma Kuma Bear","year":2020,"studio":"EMT Squared","eps":12,"type":"TV","tags":["异世界","日常"],"score":[6,6,7,5,6],"summary":"少女优奈穿着熊装备在异世界冒险，与菲娜的相遇。","verdict":"轻松异世界轻百合，熊装萌系。"},{"id":"yami-boushi","title":"暗与帽子与书之旅人","en":"Yami to Boushi to Hon no Tabibito","year":2003,"studio":"Studio Deen","eps":13,"type":"TV","tags":["经典","奇幻","致郁"],"score":[7,7,7,8,4],"summary":"为了寻找失踪的姐姐，少女与「书姬」一同穿越书的世界。","verdict":"冷门百合经典，结局令人扼腕。"},{"id":"otome-wa-boku","title":"少女爱上姐姐","en":"Otome wa Boku ni Koishiteru","year":2006,"studio":"feel.","eps":12,"type":"TV","tags":["女装","学院","搞笑"],"score":[6,6,7,7,5],"summary":"男装丽人（实为男性）进入女学园，被大小姐们包围。","verdict":"伪娘百合的经典，欢乐向。"},{"id":"love-lab","title":"恋爱研究所","en":"Love Lab","year":2013,"studio":"動画工房","eps":13,"type":"TV","tags":["学生会","搞笑","日常"],"score":[7,7,7,7,6],"summary":"贵族女校学生会的高强度恋爱研究，真木与小鹿的互动。","verdict":"轻百合搞笑番，动工出品。"},{"id":"luluco","title":"宇宙巡警露露子","en":"Space Patrol Luluco","year":2016,"studio":"Trigger","eps":13,"type":"TV","tags":["搞笑","短片","宇宙"],"score":[7,7,8,6,5],"summary":"宇宙巡警少女露露子的打工日常，电波节奏。","verdict":"Trigger短片，轻松有趣。"},{"id":"stella-no-mahou","title":"星灵感应","en":"Stella no Mahou","year":2016,"studio":"SILVER LINK","eps":12,"type":"TV","tags":["同人游戏","社团","日常"],"score":[6,6,7,6,5],"summary":"美少女同人游戏制作部的日常，村上家的特写。","verdict":"轻松日常轻百合。"},{"id":"gushing-over","title":"魔法少女与恶曾是敌人","en":"Gushing over Magical Girls","year":2024,"studio":"Asahi Production","eps":12,"type":"TV","tags":["擦边","魔法少女","搞笑"],"score":[6,6,7,8,5],"summary":"向往魔法少女的少女，竟成了恶之组织干部。","verdict":"R15浓度高的搞笑百合。"},{"id":"galaxy-angel","title":"银河天使","en":"Galaxy Angel","year":2001,"studio":"MADHOUSE","eps":74,"type":"TV","tags":["科幻","搞笑","经典"],"score":[7,7,7,6,6],"summary":"天使队少女们的宇宙冒险，轻百合日常。","verdict":"早期太空喜剧轻百合。"},{"id":"hana-tsubaki","title":"花吻在上","en":"Hana no Kiss","year":2010,"studio":"—","eps":1,"type":"OVA","tags":["成人","浓度高"],"score":[5,5,5,9,3],"summary":"同人游戏改编的成人百合OVA。","verdict":"成人向，仅作目录收录。"},{"id":"watashi-no-koi","title":"我和班上最讨厌的女生恋爱了","en":"Kiraide Isasete","year":2025,"studio":"Passione","eps":12,"type":"TV","tags":["校园","直球","恋爱"],"score":[7,7,7,9,7],"summary":"最讨厌的同班女生，竟然是最想靠近的人。2025年新番。","verdict":"直球校园百合，人气新作。"},{"id":"princess-connect","title":"公主连结Re:Dive","en":"Princess Connect Re:Dive","year":2020,"studio":"CygamesPictures","eps":13,"type":"TV","tags":["游戏","搞笑","日常"],"score":[6,6,7,5,6],"summary":"失忆主角与少女们的冒险日常，可可萝的浓度。","verdict":"游戏衍生，轻百合氛围。"},{"id":"machikado-2","title":"街角魔族 第二季","en":"Machikado Mazoku 2","year":2022,"studio":"J.C.STAFF","eps":12,"type":"TV","tags":["魔族","日常","搞笑"],"score":[8,8,7,7,7],"summary":"第二季，夏美子与桃的关系继续升温。","verdict":"夏美子与桃的关系继续升温，搞笑与甜度并存。"},{"id":"akebi-movie","title":"明日酱 剧场版","en":"Akebi-chan Movie","year":2023,"studio":"CloverWorks","eps":1,"type":"剧场","tags":["女校"],"score":[8,7,8,7,6],"summary":"明日小路在女校的日常，剧场版。","verdict":"女校百合氛围延续，画面依然精美。"},{"id":"kunlun","title":"昆仑之灯","en":"Kunlun no To","year":2024,"studio":"—","eps":12,"type":"TV","tags":["奇幻"],"score":[6,6,7,7,5],"summary":"中国风奇幻百合，2024年动画化。","verdict":"冷门新作。"},{"id":"gokujou","title":"极上!!めちゃモテ委員長?","en":"Gokujou Seitokai","year":2005,"studio":"J.C.STAFF","eps":26,"type":"TV","tags":["学生会","搞笑"],"score":[6,6,7,5,4],"summary":"超然学生会少女们的日常。","verdict":"早期学生会轻百合。"},{"id":"precure-all","title":"光之美少女 全明星","en":"Precure All Stars","year":2009,"studio":"东映","eps":1,"type":"剧场","tags":["光美","全明星"],"score":[6,6,7,5,7],"summary":"历代光美少女的共演剧场版。","verdict":"历代光美共演，全明星粉丝向。"},{"id":"senran","title":"闪乱神乐","en":"Senran Kagura","year":2013,"studio":"TNK","eps":12,"type":"TV","tags":["擦边","忍者","战斗"],"score":[5,5,6,6,5],"summary":"忍者少女们的战斗与日常，擦边浓度高。","verdict":"肉番向轻百合战斗。"},{"id":"yubisaki","title":"指尖相触，恋恋不舍","en":"Yubisaki to Renren","year":2024,"studio":"亚细亚堂","eps":12,"type":"TV","tags":["手语","恋爱","直球","治愈"],"score":[9,9,8,9,7],"summary":"手语少女与留学生之间的直球恋爱，温柔而真诚。","verdict":"2024年最大惊喜，直球浓度与治愈度双满分。"},{"id":"himesama-goumon","title":"公主大人，接下来是拷问时间","en":"Hime-sama Goumon no Jikan desu","year":2024,"studio":"CONNECT","eps":12,"type":"TV","tags":["奇幻","搞笑","浓度高"],"score":[7,7,7,8,6],"summary":"被俘的公主与魔王干部的「拷问」日常，其实是美食与撒娇。","verdict":"轻松搞笑高浓度，2024年轻百合黑马。"},{"id":"dosanko","title":"道产子少女","en":"Dosanko Gal is Super Cute","year":2024,"studio":"Silver Link","eps":12,"type":"TV","tags":["日常","恋爱","北海道"],"score":[7,7,7,7,6],"summary":"北海道少女的直球恋爱日常，方言萌度满分。","verdict":"轻松甜蜜的恋爱轻百合。"},{"id":"25-dimension","title":"2.5次元的诱惑","en":"2.5-jigen no Ririsa","year":2024,"studio":"J.C.STAFF","eps":24,"type":"TV","tags":["cosplay","社团","恋爱"],"score":[7,7,8,6,7],"summary":"cosplay社团的少少女们，喜丽亚与奥姆的二次元物语。","verdict":"cosplay题材新鲜，轻百合氛围不错。"},{"id":"vtuber-legend","title":"VTuber传奇","en":"VTuber Legend","year":2024,"studio":"OLM","eps":12,"type":"TV","tags":["VTuber","偶像"],"score":[6,6,7,5,5],"summary":"VTuber少女们的直播日常。","verdict":"题材新鲜，轻百合点缀。"},{"id":"whisper-me-movie","title":"恋语轻唱 剧场版","en":"Whisper Me a Love Song Movie","year":2025,"studio":"Cloud Hearts","eps":1,"type":"剧场","tags":["乐队","直球"],"score":[8,8,8,9,7],"summary":"依与木乃香的大银幕延续。","verdict":"TV的延续，直球乐队百合剧场版。"},{"id":"dungeon-meshi","title":"迷宫饭","en":"Dungeon Meshi","year":2024,"studio":"Trigger","eps":24,"type":"TV","tags":["奇幻","美食","冒险"],"score":[9,9,9,4,9],"summary":"迷宫探索+美食的神作，玛露希尔与西丝尔的魔法羁绊。","verdict":"不是百合但玛露西丝CP极香，Trigger制作顶级。"},{"id":"frieren","title":"葬送的芙莉莲","en":"Frieren: Beyond Journey's End","year":2023,"studio":"MADHOUSE","eps":28,"type":"TV","tags":["奇幻","哲学","治愈"],"score":[10,10,10,3,10],"summary":"千年精灵魔法使的旅途，芙莉莲与费伦的师徒羁绊。","verdict":"不是百合但女性羁绊极深，年度神作。"},{"id":"oshinoko-s2","title":"推しの子 第二季","en":"Oshi no Ko S2","year":2024,"studio":"動画工房","eps":13,"type":"TV","tags":["演艺","悬疑"],"score":[8,8,8,4,9],"summary":"演艺界的黑暗与光芒，爱继续闪耀。","verdict":"第二季继续高能，轻百合点缀。"}];
+
+const DIMS = ["剧情与深度","角色塑造","作画/演出/音乐","百合浓度","热门程度"];
+const DIM_COLORS = ["#b14a6c","#d86a8a","#b6a0c9","#e78fb1","#8f7aa8"];
+const DEFAULT_WEIGHTS = [30,30,20,10,10];
+const PAGE_SIZE = 24;
+const LS_RATINGS = "yuri_my_ratings_v2";
+
+/* ---------- 封面兜底映射（MAL CDN，已在原版基础上修正重复键与错键） ---------- */
+const COVER_MAP = {
+"bloom-into-you":40982,"citrus":34728,"gundam-witch":54872,"mygo":55998,"ave-mujica":59759,
+"lycoris-recoil":50709,"madoka":9756,"utena":334,"mari-mite":1287,"if-villainess":55699,
+"fragtime":40630,"yuru-yuri":10417,"sakura-trick":20048,"new-game":32106,"gochiusa":21267,
+"madoka-movie":11977,"kannazuki":1399,"whisper-me":56925,"oshi-akuyaku":56167,
+"revue-starlight":36647,"liz-to-aoitori":37928,"hibike":28623,"adachi-shimamura":40670,
+"k-on":5680,"girls-last-tour":34978,"kobayashi":33263,"kageki-shojo":48316,
+"strawberry-panic":1307,"aoi-hana":6045,"sasameki":6085,"ga-rei-zero":4725,
+"yuki-yuna":28608,"bocchi-rock":49891,"yuru-camp":34798,"sora-yori":35839,
+"non-non-biyori":17549,"cardcaptor":232,"sailor-moon":530,"lovelive":15051,
+"nanoha":78,"mai-hime":134,"selector":20965,"flip-flappers":32983,
+"yuri-ko":28817,"machikado":39072,"wonder-egg":42531,"akebi":49700,
+"hanebado":36266,"school-live":29825,"k-on-2":7791,"azumanga":68,
+"nichijou":8857,"lucky-star":1887,"kiniro-mosaic":16067,"hanayamata":21681,
+"harukana":35220,"happy-sugar-life":37141,"wataten":37035,"hitori-bocchi":38107,
+"sounan":40174,"granbelm":39417,"assault-lily":40337,"orchid-heart":39691,
+"aku-no-jo":41457,"watashi-yuri":55127,"princess-principal":35246,
+"simoun":1450,"mikagura":29119,"strike-witches":3667,"senki-zesshou":11751,
+"kancolle":2685,"bofuri":38666,"gabriel":33731,"working":7645,
+"yama-no-susume":17535,"sabagebu":20843,"love-lab":16061,"koufuku":28387,
+"koisuru-asteroid":39581,"onipan":50720,"rolling-girls":28869,
+"world-dai-star":54742,"jinrui":12725,"rayearth":1452,"battle-athletes":1485,
+"queens-blade":5039,"gakuen-alice":1085,"idolmaster":1037,"aikatsu":15061,
+"pripara":23151,"doki-precure":16355,"smile-precure":12745,"mahotsukai-precure":31853,
+"azur-lane":38328,"ichigo-mashimaro":1491,"mikakunin":20221,"uma-musume":37391,
+"uma-musume2":41959,"uma-musume3":53280,"zombie-land":37972,"valkyrie-drive":30757,
+"tama-yomi":40393,"houkago-pleiades":28253,"chio-chan":36345,"joshiraku":12679,
+"mitsuboshi":34425,"tamayura":8795,"sora-no-woto":6512,"neighbor-vampire":37777,
+"princess-connect":40336,"kuma-kuma":41265,"yami-boushi":1410,"otome-wa-boku":2064,
+"luluco":32281,"stella-no-mahou":32998,"gushing-over":57346,"galaxy-angel":1043
+};
+function malCoverUrl(id){ const m=COVER_MAP[id]; return m?`https://cdn.myanimelist.net/images/anime/${m}.jpg`:null; }
+
+let ANIME = [...FALLBACK_ANIME];
+let DATA_META = null;
+let weights = [...DEFAULT_WEIGHTS];
+let activeChip = null;
+let sortMode = "score";
+let query = "";
+let visibleCount = PAGE_SIZE;
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const clamp = (n,a,b)=>Math.min(b,Math.max(a,n));
+const round1 = n => Math.round(n*10)/10;
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- 我的评分（localStorage） ---------- */
+function loadMyRatings(){ try{ return JSON.parse(localStorage.getItem(LS_RATINGS))||{}; }catch(e){ return {}; } }
+let myRatings = loadMyRatings();
+function saveMyRatings(){ try{ localStorage.setItem(LS_RATINGS, JSON.stringify(myRatings)); }catch(e){} }
+
+/* ---------- 评分模型 ----------
+ * 第 5 维「热门程度」为动态值：
+ *   hot = hand*0.45 + community*0.35 + popN*0.20
+ *   - hand: 手工人气（1-10）
+ *   - community: AniList 社区均分/10；若用户打了「我的评分」则替换为我的评分
+ *   - popN: 由 AniList 人气归一化的 1-10
+ */
+function hotDim(a){
+  const hand = (a.score && a.score[4] != null) ? a.score[4] : 5;
+  const mine = myRatings[a.id];
+  const community = mine != null ? mine : (a.meanScore != null ? a.meanScore/10 : null);
+  let popN = 5;
+  if(a.popularity > 0){ popN = clamp(3 + 4*Math.log10(a.popularity+1)/6, 1, 10); }
+  if(community != null) return round1(hand*0.45 + community*0.35 + popN*0.20);
+  return hand;
+}
+function dimScore(a,i){ return i===4 ? hotDim(a) : a.score[i]; }
+function recScore(a){ return round1(weights.reduce((s,w,i)=>s + w*dimScore(a,i),0)/100); }
+function communityDisplay(a){ return a.meanScore != null ? (a.meanScore/10).toFixed(1) : null; }
+
+/* ---------- 数据加载：优先 anime.json，失败用内置兜底 ---------- */
+function getCoverUrl(a){
+  if(a.cover) return a.cover;
+  const m = malCoverUrl(a.id);
+  if(m) return m;
+  return null;
+}
+function coverFallbackHTML(title){
+  const initials = String(title||"").replace(/[\s\u300c\u300d\u300e\u300f\uff01\uff5e\u2606\u2605\u00b7!~]/g,"").slice(0,2);
+  return `<div class="cover-fallback">${esc(initials)}</div>`;
+}
+
+/* ---------- 权重滑杆 ---------- */
+function buildSliders(){
+  const box = $("#sliders");
+  box.innerHTML = "";
+  weights.forEach((w,i)=>{
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.setProperty("--pc", DIM_COLORS[i]);
+    row.innerHTML = `<label><span class="dot" style="background:${DIM_COLORS[i]}"></span>${DIMS[i]}</label>
+      <input type="range" min="0" max="100" step="1" value="${w}" aria-label="${DIMS[i]}权重">
+      <output>${w}%</output>`;
+    const inp = row.querySelector("input");
+    const out = row.querySelector("output");
+    const paint = ()=>{
+      const p = inp.value;
+      inp.style.setProperty("--pct", p + "%");
+      out.textContent = p + "%";
+    };
+    paint();
+    inp.addEventListener("input", ()=>{ weights[i] = +inp.value; paint(); refresh(); });
+    box.appendChild(row);
+  });
+}
+
+/* ---------- 花瓣雷达图 ---------- */
+function drawRadar(canvas, anime, weights, {size=120, labels=false, weightDim=true}={}){
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  const W = size, H = size;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const cx = W/2, cy = H/2;
+  const R = W/2 - (labels ? 30 : 9);
+  const N = 5;
+  const ang = i => -Math.PI/2 + i*2*Math.PI/N;
+  const px = (i,r)=> cx + Math.cos(ang(i))*r;
+  const py = (i,r)=> cy + Math.sin(ang(i))*r;
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(58,36,48,.10)";
+  [0.25,0.5,0.75,1].forEach(f=>{
+    ctx.beginPath();
+    for(let i=0;i<=N;i++){
+      const r = R*f, idx = i%N;
+      i===0 ? ctx.moveTo(px(idx,r),py(idx,r)) : ctx.lineTo(px(idx,r),py(idx,r));
+    }
+    ctx.closePath(); ctx.stroke();
+  });
+  for(let i=0;i<N;i++){ ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px(i,R),py(i,R)); ctx.stroke(); }
+
+  for(let i=0;i<N;i++){
+    const v = clamp(dimScore(anime,i)/10, 0.02, 1);
+    const op = weightDim ? clamp(weights[i]/100, 0.15, 1) : 1;
+    const x0 = px(i, R*v), y0 = py(i, R*v);
+    const cpxL = px(i, R*v) - Math.sin(ang(i))*R*0.42*v;
+    const cpyL = py(i, R*v) + Math.cos(ang(i))*R*0.42*v;
+    const cpxR = px(i, R*v) + Math.sin(ang(i))*R*0.42*v;
+    const cpyR = py(i, R*v) - Math.cos(ang(i))*R*0.42*v;
+    ctx.beginPath();
+    ctx.moveTo(x0,y0);
+    ctx.quadraticCurveTo(cpxL, cpyL, cx, cy);
+    ctx.quadraticCurveTo(cpxR, cpyR, x0, y0);
+    ctx.closePath();
+    ctx.fillStyle = DIM_COLORS[i];
+    ctx.globalAlpha = clamp(op*0.42, 0.08, 0.55);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = DIM_COLORS[i];
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = op;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  ctx.beginPath();
+  for(let i=0;i<N;i++){
+    const r = R*(dimScore(anime,i)/10);
+    i===0 ? ctx.moveTo(px(i,r),py(i,r)) : ctx.lineTo(px(i,r),py(i,r));
+  }
+  ctx.closePath();
+  ctx.strokeStyle = "rgba(177,74,108,.55)";
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  for(let i=0;i<N;i++){
+    const r = R*(dimScore(anime,i)/10);
+    ctx.beginPath(); ctx.arc(px(i,r), py(i,r), 2.6, 0, Math.PI*2); ctx.fillStyle = DIM_COLORS[i]; ctx.fill();
+  }
+  if(labels){
+    ctx.fillStyle = "rgba(58,36,48,.65)";
+    ctx.font = "10px sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    for(let i=0;i<N;i++){ ctx.fillText(DIMS[i], px(i,R+20), py(i,R+20)); }
+  }
+}
+function dimScoreForRadar(){ /* 已废弃，雷达图统一使用 dimScore(anime,i) */ }
+
+/* ---------- 卡片 ---------- */
+function cardHTML(a, rank){
+  const coverUrl = getCoverUrl(a);
+  const coverHTML = coverUrl
+    ? `<img src="${esc(coverUrl)}" alt="${esc(a.title)}" loading="lazy" data-title="${esc(a.title)}">`
+    : coverFallbackHTML(a.title);
+  const comm = communityDisplay(a);
+  const mine = myRatings[a.id];
+  const auto = a.source === "auto";
+  return `<article class="card" tabindex="0" role="button" aria-label="${esc(a.title)}详情" data-id="${a.id}">
+    <div class="card-cover">
+      ${coverHTML}
+      <span class="badge-cover ${rank<=3?'show':''}">${rank===1?'最对味':rank===2?'次席':'第三'}</span>
+      <div class="rank-overlay r${rank<=3?rank:''}">${String(rank).padStart(2,"0")}</div>
+      ${comm?`<span class="comm-badge">社区 <b>${comm}</b></span>`:""}
+    </div>
+    <div class="card-body">
+      <div class="card-head">
+        <h3>${esc(a.title)}<small>${esc(a.en||"")}</small></h3>
+      </div>
+      <div class="meta"><span class="y">${a.year||"—"}</span><span>${esc(a.studio||"—")}</span><span>${a.eps||"?"}集</span><span>${esc(a.type||"")}</span></div>
+      <div class="tags">${(a.tags||[]).filter(Boolean).map(t=>`<span class="tag ${t==="自动收录"?"auto":""}">${esc(t)}</span>`).join("")}</div>
+      <p class="desc">${esc(a.summary||"")}</p>
+      <div class="scorebar"><span class="score-num">${recScore(a)}</span><span class="score-label">综合 · 占卜</span>${mine!=null?`<span class="score-label mine">我的 ${mine}</span>`:""}</div>
+      <div class="radar-wrap"><canvas width="120" height="120"></canvas></div>
+      <div class="tap">点击查看详情 →</div>
+    </div>
+  </article>`;
+}
+
+function drawVisibleRadars(){
+  $$(".card").forEach(card=>{
+    const a = ANIME.find(x=>x.id===card.dataset.id);
+    if(!a) return;
+    const cv = card.querySelector("canvas");
+    if(cv && cv.isConnected) drawRadar(cv, a, weights, {size:120});
+  });
+}
+
+/* ---------- 筛选 / 排序 ---------- */
+function filteredList(){
+  let list = [...ANIME];
+  if(activeChip) list = list.filter(a=>(a.tags||[]).includes(activeChip));
+  if(query){
+    const q = query.toLowerCase();
+    list = list.filter(a=>
+      (a.title||"").toLowerCase().includes(q) ||
+      (a.en||"").toLowerCase().includes(q) ||
+      (a.studio||"").toLowerCase().includes(q) ||
+      String(a.year).includes(q) ||
+      (a.tags||[]).some(t=>t.toLowerCase().includes(q))
+    );
+  }
+  switch(sortMode){
+    case "score":
+      list.sort((a,b)=> recScore(b)-recScore(a) || ((b.score?.[3]||0)-(a.score?.[3]||0)) || ((b.score?.[0]||0)-(a.score?.[0]||0)));
+      break;
+    case "year":
+      list.sort((a,b)=> (b.year||0) - (a.year||0));
+      break;
+    case "name":
+      list.sort((a,b)=> String(a.title).localeCompare(String(b.title),"zh"));
+      break;
+    case "kuchisu":
+      list.sort((a,b)=> ((b.score?.[3]||0)-(a.score?.[3]||0)) || recScore(b)-recScore(a));
+      break;
+    case "community":
+      list.sort((a,b)=> (b.meanScore||0)-(a.meanScore||0) || b.popularity-a.popularity);
+      break;
+  }
+  return list;
+}
+
+function refresh(){
+  const list = filteredList();
+  const show = list.slice(0, visibleCount);
+  $("#match-count").textContent = list.length;
+  $("#result-count").textContent = list.length;
+  const top = list[0];
+  $("#top-pick").innerHTML = top ? `当前第一位：<b>《${esc(top.title)}》</b> ${recScore(top)}分` : "";
+  $("#grid").innerHTML = list.length
+    ? show.map((a,i)=>cardHTML(a,i+1)).join("")
+    : `<div class="empty">没有找到匹配的百合番。<br>换个关键词，或把「全部」标签点回来试试。</div>`;
+  const lm = $("#load-more");
+  lm.disabled = show.length >= list.length;
+  lm.textContent = show.length >= list.length ? "已到底部 ✿" : `展开更多（${show.length}/${list.length}）↓`;
+  drawVisibleRadars();
+}
+
+/* ---------- 类型筛选 ---------- */
+function buildChips(){
+  const counts = {};
+  ANIME.forEach(a=>(a.tags||[]).forEach(t=>{ if(t) counts[t]=(counts[t]||0)+1; }));
+  const keys = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  const box = $("#chips");
+  box.innerHTML = `<button class="chip on" data-t="">全部</button>` +
+    keys.map(k=>`<button class="chip" data-t="${esc(k)}">${k}</button>`).join("");
+  box.addEventListener("click", e=>{
+    const b = e.target.closest(".chip");
+    if(!b) return;
+    $$(".chip").forEach(c=>c.classList.remove("on"));
+    b.classList.add("on");
+    activeChip = b.dataset.t || null;
+    visibleCount = PAGE_SIZE;
+    refresh();
+  });
+}
+
+/* ---------- 弹窗 ---------- */
+function openModal(a){
+  const rank = filteredList().indexOf(a)+1;
+  const total = recScore(a);
+  const body = $("#modal-body");
+  const coverUrl = getCoverUrl(a);
+  const coverHTML = coverUrl
+    ? `<img class="modal-cover" src="${esc(coverUrl)}" alt="${esc(a.title)}" data-title="${esc(a.title)}">`
+    : `<div class="modal-cover-fallback">${esc(String(a.title).replace(/[\s\u300c\u300d\u300e\u300f\uff01\uff5e\u2606\u2605\u00b7!~]/g,"").slice(0,2))}</div>`;
+  const bars = DIMS.map((d,i)=>`
+    <div class="bar-row" style="--dc:${DIM_COLORS[i]}">
+      <span class="name">${d}</span>
+      <span class="track"><span class="fill" data-w="${(dimScore(a,i)/10)*100}%"></span></span>
+      <span class="val">${dimScore(a,i)}</span>
+    </div>`).join("");
+  const comm = communityDisplay(a);
+  const mine = myRatings[a.id];
+  const myVal = mine != null ? mine : 5;
+  body.innerHTML = `
+    ${coverHTML}
+    <h2>${esc(a.title)}<small>${esc(a.en||"")} · #${String(rank).padStart(2,"0")}</small></h2>
+    <div class="meta-line"><span class="y">${a.year||"—"}</span> · ${esc(a.studio||"—")} · ${a.eps||"?"}集 · ${esc(a.type||"")} · <span class="y">综合 ${total} 分</span></div>
+    <p class="tagline">${esc(a.summary||"")}</p>
+    <div class="community-box">
+      <div class="item"><span class="k">ANILIST ID</span><span class="v">${a.anilistId?"#"+a.anilistId:"—"}</span></div>
+      <div class="item"><span class="k">社区均分</span><span class="v">${comm!=null?comm+"<small> / 10</small>":"暂无"}</span></div>
+      <div class="item"><span class="k">社区人气</span><span class="v">${a.popularity?a.popularity.toLocaleString():"—"}</span></div>
+      <div class="item"><span class="k">数据来源</span><span class="v" style="font-size:11px">${a.source==="auto"?"AniList 自动收录":"手工精编 + AniList"}</span></div>
+    </div>
+    <div class="myrate">
+      <span class="mr-label">我的评分</span>
+      <input type="range" id="myrate" min="0" max="10" step="1" value="${myVal}" aria-label="我的评分">
+      <output id="myrate-out">${mine!=null?mine+" 分":"未评分"}</output>
+      <button class="mr-clear" id="myrate-clear">清除</button>
+    </div>
+    <div class="score-block">
+      <div class="bars">${bars}</div>
+      <div class="radar-lg"><canvas id="radar-lg" width="220" height="220"></canvas></div>
+    </div>
+    <div class="verdict">${esc(a.verdict||"")}</div>
+    <div class="notes">五维评分 · 10分制 ｜ 综合分 = 各维度 × 权重加权平均 ｜「热门程度」融合社区均分与我的评分 ｜ 收录含轻百合、真百合与自动收录新番</div>
+    ${a.source==="auto"?'<span class="note-auto">※ 本条目由 AniList 自动收录，五维评分为社区数据估算，仅供参考。</span>':''}`;
+  drawRadar($("#radar-lg"), a, weights, {size:220, labels:true});
+  requestAnimationFrame(()=>{ $$(".fill").forEach(f=> f.style.width = f.dataset.w); });
+
+  /* 我的评分交互 */
+  const mr = $("#myrate");
+  const mo = $("#myrate-out");
+  const paint = ()=>{
+    const v = +mr.value;
+    if(v===0){ delete myRatings[a.id]; mo.textContent = "未评分"; }
+    else { myRatings[a.id] = v; mo.textContent = v+" 分"; }
+    saveMyRatings();
+    refresh();
+    // 局部更新弹窗内分数与排名
+    const newTotal = recScore(a);
+    const newRank = filteredList().indexOf(a)+1;
+    const metaLine = $(".modal .meta-line");
+    if(metaLine) metaLine.innerHTML = metaLine.innerHTML.replace(/综合 \d+(\.\d+)? 分/, `综合 ${newTotal} 分`);
+    const h2small = document.querySelector(".modal h2 small");
+    if(h2small) h2small.textContent = `${esc(a.en||"")} · #${String(newRank).padStart(2,"0")}`;
+    const bars2 = DIMS.map((d,i)=>`
+      <div class="bar-row" style="--dc:${DIM_COLORS[i]}">
+        <span class="name">${d}</span>
+        <span class="track"><span class="fill" data-w="${(dimScore(a,i)/10)*100}%"></span></span>
+        <span class="val">${dimScore(a,i)}</span>
+      </div>`).join("");
+    document.querySelector(".modal .bars").innerHTML = bars2;
+    requestAnimationFrame(()=>{ $$(".fill").forEach(f=> f.style.width = f.dataset.w); });
+    drawRadar($("#radar-lg"), a, weights, {size:220, labels:true});
+  };
+  mr.addEventListener("input", ()=>{
+    const v = +mr.value;
+    if(v===0) mo.textContent = "未评分"; else mo.textContent = v+" 分";
+  });
+  mr.addEventListener("change", paint);
+  $("#myrate-clear").addEventListener("click", ()=>{ mr.value = 0; paint(); });
+
+  $("#overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(){ $("#overlay").classList.remove("open"); document.body.style.overflow = ""; }
+
+/* ---------- 数据加载 ---------- */
+async function loadData(){
+  try{
+    const [aRes, mRes] = await Promise.all([
+      fetch("data/anime.json", {cache:"no-cache"}),
+      fetch("data/meta.json", {cache:"no-cache"}).catch(()=>null)
+    ]);
+    if(aRes.ok){
+      const data = await aRes.json();
+      if(Array.isArray(data) && data.length){
+        ANIME = data;
+      }
+    }
+    if(mRes && mRes.ok){
+      DATA_META = await mRes.json();
+    }
+  }catch(e){
+    /* 网络失败 → 使用内置兜底数据 */
+  }
+  $("#total-count").textContent = ANIME.length;
+  const up = $("#update-line");
+  if(DATA_META && DATA_META.generatedAt){
+    const d = new Date(DATA_META.generatedAt);
+    const pad = n=>String(n).padStart(2,"0");
+    up.innerHTML = `AniList 同步 · <b>${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}</b> · 新番 ${DATA_META.autoCount||0} 部`;
+  }else{
+    up.textContent = "内置精编数据（离线模式）";
+  }
+  buildChips();
+  refresh();
+}
+
+/* ---------- 初始化 ---------- */
+function init(){
+  buildSliders();
+  $("#reset").addEventListener("click", ()=>{
+    weights = [...DEFAULT_WEIGHTS];
+    $$("#sliders input").forEach((inp,i)=>{
+      inp.value = weights[i];
+      inp.style.setProperty("--pct", weights[i]+"%");
+      inp.nextElementSibling.textContent = weights[i]+"%";
+    });
+    visibleCount = PAGE_SIZE;
+    refresh();
+  });
+  $("#sort").addEventListener("change", e=>{ sortMode = e.target.value; visibleCount = PAGE_SIZE; refresh(); });
+  let debounce;
+  $("#search").addEventListener("input", e=>{
+    clearTimeout(debounce);
+    debounce = setTimeout(()=>{ query = e.target.value.trim(); visibleCount = PAGE_SIZE; refresh(); }, 180);
+  });
+  $("#load-more").addEventListener("click", ()=>{ visibleCount += PAGE_SIZE; refresh(); });
+  $("#overlay").addEventListener("click", e=>{ if(e.target.id==="overlay") closeModal(); });
+  $("#modal-close").addEventListener("click", closeModal);
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeModal(); closeHelp(); } });
+  /* Help modal */
+  function closeHelp(){ $("#help-overlay").classList.remove("open"); document.body.style.overflow = ""; }
+  $("#help-btn").addEventListener("click", ()=>{ $("#help-overlay").classList.add("open"); document.body.style.overflow = "hidden"; });
+  $("#help-close").addEventListener("click", closeHelp);
+  $("#help-overlay").addEventListener("click", e=>{ if(e.target.id==="help-overlay") closeHelp(); });
+  if(!sessionStorage.getItem("help-shown")){
+    setTimeout(()=>{ $("#help-overlay").classList.add("open"); sessionStorage.setItem("help-shown","1"); }, 800);
+  }
+  $("#grid").addEventListener("click", e=>{
+    const card = e.target.closest(".card");
+    if(card) openModal(ANIME.find(x=>x.id===card.dataset.id));
+  });
+  $("#grid").addEventListener("keydown", e=>{
+    if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("card")){
+      e.preventDefault();
+      openModal(ANIME.find(x=>x.id===e.target.dataset.id));
+    }
+  });
+  /* 封面图片加载失败兜底 */
+  document.addEventListener("error", e=>{
+    if(e.target.tagName!=="IMG") return;
+    const img = e.target;
+    const cover = img.closest(".card-cover");
+    if(cover){
+      const title = img.dataset.title || "";
+      const initials = String(title).replace(/[\s\u300c\u300d\u300e\u300f\uff01\uff5e\u2606\u2605\u00b7!~]/g,"").slice(0,2);
+      img.style.display = "none";
+      if(!cover.querySelector(".cover-fallback")){
+        const fb = document.createElement("div");
+        fb.className = "cover-fallback";
+        fb.textContent = initials;
+        cover.insertBefore(fb, cover.firstChild);
+      }
+    }
+    if(img.classList.contains("modal-cover")){
+      const title = img.dataset.title || "";
+      const initials = String(title).replace(/[\s\u300c\u300d\u300e\u300f\uff01\uff5e\u2606\u2605\u00b7!~]/g,"").slice(0,2);
+      const fb = document.createElement("div");
+      fb.className = "modal-cover-fallback";
+      fb.textContent = initials;
+      img.replaceWith(fb);
+    }
+  }, true);
+
+  loadData();
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

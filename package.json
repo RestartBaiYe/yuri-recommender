@@ -1,0 +1,21 @@
+{
+  "name": "yuri-recommender",
+  "version": "2.0.0",
+  "description": "花占卜 · 百合番推荐器 —— 基于 AniList 实时数据的百合番推荐站",
+  "type": "module",
+  "scripts": {
+    "update": "node scripts/fetch.mjs",
+    "serve": "npx serve ."
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "yuri",
+    "anime",
+    "recommender",
+    "anilist",
+    "百合"
+  ],
+  "license": "MIT"
+}
