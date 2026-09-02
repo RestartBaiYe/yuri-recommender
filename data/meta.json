@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-02T08:10:40.739Z",
+  "generatedAt": "2026-09-02T09:40:14.150Z",
   "total": 236,
   "curatedCount": 209,
   "autoCount": 27,
@@ -12,9 +12,21 @@
       "bestSim": "0.00"
     },
     {
+      "id": "wataten",
+      "title": "天使降临到我身边",
+      "en": "Watashi ni Tenshi ga Maiorita!",
+      "bestSim": "0.00"
+    },
+    {
       "id": "sae",
       "title": "佐伯沙弥香的追忆",
       "en": "Saeki Sayaka ni Omakase",
+      "bestSim": "0.00"
+    },
+    {
+      "id": "demons",
+      "title": "恶魔之谜",
+      "en": "Akuma no Riddle",
       "bestSim": "0.00"
     },
     {
@@ -28,6 +40,18 @@
       "title": "魔法少女小圆 剧场版 永恒",
       "en": "Madoka Movie 2",
       "bestSim": "0.50"
+    },
+    {
+      "id": "rayearth",
+      "title": "魔法骑士雷阿斯",
+      "en": "Magic Knight Rayearth",
+      "bestSim": "0.00"
+    },
+    {
+      "id": "slime-300",
+      "title": "打了300年的史莱姆",
+      "en": "Slime 300",
+      "bestSim": "0.31"
     },
     {
       "id": "yama-ai",
