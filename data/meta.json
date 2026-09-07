@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-02T12:15:19.288Z",
-  "total": 198,
+  "generatedAt": "2026-09-07T09:29:47.754Z",
+  "total": 185,
   "curatedCount": 185,
-  "autoCount": 13,
+  "autoCount": 0,
   "currentSeason": "SUMMER 2026",
   "unmatched": [
     {
@@ -15,13 +15,13 @@
       "id": "madoka-5",
       "title": "魔法少女小圆 剧场版 起始",
       "en": "Madoka Movie 1",
-      "bestSim": "0.50"
+      "bestSim": "0.00"
     },
     {
       "id": "madoka-6",
       "title": "魔法少女小圆 剧场版 永恒",
       "en": "Madoka Movie 2",
-      "bestSim": "0.50"
+      "bestSim": "0.00"
     },
     {
       "id": "yama-ai",
@@ -57,7 +57,7 @@
       "id": "kunlun",
       "title": "昆仑之灯",
       "en": "Kunlun no To",
-      "bestSim": "0.25"
+      "bestSim": "0.00"
     },
     {
       "id": "whisper-me-movie",
