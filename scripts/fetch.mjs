@@ -415,21 +415,30 @@ async function main() {
       source: "auto",
     };
   });
-  console.log(`自动收录合计 ${autoEntries.length} 部`);
+
+  /* 防回退：若本次季度查询失败、或过滤后为空，沿用上期自动收录条目（仅保留近两年内的），
+   * 避免一次查询异常就把之前收录的新番全部抹掉。 */
+  const prevAuto = fs.existsSync(animePath)
+    ? JSON.parse(fs.readFileSync(animePath, "utf-8")).filter((p) => p.source === "auto")
+    : [];
+  const newAutoIds = new Set(autoEntries.map((e) => e.id));
+  const carried = prevAuto.filter((p) => !newAutoIds.has(p.id) && (p.year || 0) >= curYear - 1);
+  const allAuto = [...autoEntries, ...carried];
+  console.log(`自动收录：本次新增 ${autoEntries.length} 部${carried.length ? `，沿用上期 ${carried.length} 部` : ""}，合计 ${allAuto.length} 部`);
 
   /* ----- 写入输出 ----- */
-  const all = [...enriched, ...autoEntries];
+  const all = [...enriched, ...allAuto];
   fs.writeFileSync(animePath, JSON.stringify(all, null, 2), "utf-8");
   fs.writeFileSync(metaPath, JSON.stringify({
     generatedAt: new Date().toISOString(),
     total: all.length,
     curatedCount: enriched.length,
-    autoCount: autoEntries.length,
+    autoCount: allAuto.length,
     currentSeason: `${curSeason} ${curSeasonYear}`,
     unmatched,
   }, null, 2), "utf-8");
 
-  console.log(`\n✅ 完成：data/anime.json 共 ${all.length} 部（手工 ${enriched.length} + 自动 ${autoEntries.length}）`);
+  console.log(`\n✅ 完成：data/anime.json 共 ${all.length} 部（手工 ${enriched.length} + 自动 ${allAuto.length}）`);
   console.log(`   封面可用 ${all.filter((e) => e.cover).length}/${all.length} 部`);
   if (unmatched.length) {
     console.log(`\n⚠️ ${unmatched.length} 条未匹配，请人工核对并在 OVERRIDES 中补充:`);
