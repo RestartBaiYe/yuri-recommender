@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "update": "node scripts/fetch.mjs",
+    "validate": "node scripts/validate.mjs",
+    "verify": "node scripts/verify.mjs",
+    "test": "node scripts/dom-test.mjs",
+    "sync-fallback": "node scripts/sync-fallback.mjs",
     "serve": "npx serve ."
   },
   "engines": {
@@ -17,5 +21,8 @@
     "anilist",
     "百合"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^30.0.1"
+  }
 }

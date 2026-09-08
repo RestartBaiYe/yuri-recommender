@@ -43,6 +43,9 @@ const OVERRIDES = {
   "tama-yomi": "Tamayomi",
   "madoka-movie": "Mahou Shoujo Madoka☆Magica: Hangyaku no Monogatari",
   "madoka-4": "Mahou Shoujo Madoka Magica: Walpurgis no Kaiten",
+  "madoka-5": "Mahou Shoujo Madoka Magica Movie 1: Hajimari no Monogatari",
+  "madoka-6": "Mahou Shoujo Madoka Magica Movie 2: Eien no Monogatari",
+  "hana-tsubaki": "Sono Hanabira ni Kuchizuke wo",
   "fate-illya": "Fate kaleid liner Prisma Illya",
   "gokigen": "High School Fleet: The Movie",
   "washi-usa": "Yuuki Yuuna wa Yuusha de Aru: Washio Sumi no Shou",
@@ -79,6 +82,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function simScore(a, b) {
   const ta = String(a || "").toLowerCase().match(/[a-z0-9\u3040-\u30ff]+/g) || [];
   const tb = String(b || "").toLowerCase().match(/[a-z0-9\u3040-\u30ff]+/g) || [];
+  // 补充 CJK 汉字词元：早期正则只覆盖假名，纯中文标题的相似度恒为 0，导致匹配失败
+  const isHan = (c) => { const n = c.codePointAt(0); return (n >= 0x3400 && n <= 0x4dbf) || (n >= 0x4e00 && n <= 0x9fff); };
+  for (const ch of String(a || "")) if (isHan(ch)) ta.push(ch);
+  for (const ch of String(b || "")) if (isHan(ch)) tb.push(ch);
   if (!ta.length || !tb.length) return 0;
   const sb = new Set(tb);
   let common = 0;
@@ -124,7 +131,7 @@ query($search: String) {
     meanScore popularity
     seasonYear season
     episodes status format
-    studios { nodes { name } }
+    studios { nodes { name isAnimationStudio } }
   }
 }`;
 
@@ -137,7 +144,7 @@ query($id: Int) {
     meanScore popularity
     seasonYear season
     episodes status format
-    studios { nodes { name } }
+    studios { nodes { name isAnimationStudio } }
   }
 }`;
 
@@ -153,7 +160,7 @@ query($season: MediaSeason, $year: Int, $perPage: Int, $page: Int) {
       episodes status format
       genres
       tags { name rank }
-      studios { nodes { name } }
+      studios { nodes { name isAnimationStudio } }
     }
   }
 }`;
@@ -167,7 +174,10 @@ function mapMedia(m) {
   const romaji = m.title?.romaji || "";
   const english = m.title?.english || "";
   const native = m.title?.native || "";
-  const studio = (m.studios?.nodes || []).map((s) => s.name).filter(Boolean).join(" / ");
+  // 只取「动画制作公司」，避免把出品/音乐/发行方拼成一长串（如 "TROYCA / AT-X / Sony Music..."）
+  const studioNodes = (m.studios?.nodes || []).filter((s) => s && s.name);
+  const primaryStudio = studioNodes.find((s) => s.isAnimationStudio) || studioNodes[0];
+  const studio = primaryStudio ? primaryStudio.name : "";
   return {
     anilistId: m.id,
     romaji,

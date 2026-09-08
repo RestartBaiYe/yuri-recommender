@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Validate curated data
+        run: node scripts/validate.mjs
+
       - name: Fetch latest AniList data
         run: node scripts/fetch.mjs
 
