@@ -877,28 +877,6 @@
     "verdict": "喜欢美月这类角色的话浓度会相当顶。"
   },
   {
-    "id": "sae",
-    "title": "佐伯沙弥香的追忆",
-    "en": "Saeki Sayaka ni Omakase",
-    "year": 2020,
-    "studio": "TROYCA",
-    "eps": 1,
-    "type": "OVA",
-    "tags": [
-      "外传",
-      "文学"
-    ],
-    "score": [
-      8,
-      8,
-      8,
-      8,
-      6
-    ],
-    "summary": "终将成为你外传，补全佐伯沙弥香的独白。",
-    "verdict": "粉丝必看。"
-  },
-  {
     "id": "yuri-ko",
     "title": "百合熊风暴",
     "en": "Yurikuma Arashi",
@@ -1861,8 +1839,8 @@
   },
   {
     "id": "madoka-5",
-    "title": "魔法少女小圆 剧场版 起始",
-    "en": "Madoka Movie 1",
+    "title": "魔法少女小圆 剧场版 起始的物语",
+    "en": "Puella Magi Madoka Magica the Movie: Beginnings",
     "year": 2012,
     "studio": "SHAFT",
     "eps": 1,
@@ -1882,8 +1860,8 @@
   },
   {
     "id": "madoka-6",
-    "title": "魔法少女小圆 剧场版 永恒",
-    "en": "Madoka Movie 2",
+    "title": "魔法少女小圆 剧场版 永恒的物语",
+    "en": "Puella Magi Madoka Magica the Movie: Eternal",
     "year": 2012,
     "studio": "SHAFT",
     "eps": 1,
@@ -1992,7 +1970,7 @@
   {
     "id": "hiro-no-kao",
     "title": "想吃掉我的非人少女",
-    "en": "Kowarekake no Orgel",
+    "en": "This Monster Wants to Eat Me",
     "year": 2025,
     "studio": "Studio Lings",
     "eps": 13,
@@ -3353,10 +3331,10 @@
     "verdict": "第三季继续热血与感动，赛马娘IP核心。"
   },
   {
-    "id": "yama-ai",
-    "title": "山田与加濑同学",
-    "en": "Yamada to Kase-san",
-    "year": 2017,
+    "id": "asagao",
+    "title": "牵牛花与加濑同学",
+    "en": "Asagao to Kase-san.",
+    "year": 2018,
     "studio": "Zexcs",
     "eps": 1,
     "type": "OVA",
@@ -3372,75 +3350,8 @@
       9,
       5
     ],
-    "summary": "田径部的山田与园艺部的加濑，青涩而直球的校园恋曲。",
-    "verdict": "短小但甜度爆炸，直球百合的经典OVA。"
-  },
-  {
-    "id": "kase-san2",
-    "title": "加濑同学系列 剧场版",
-    "en": "Kase-san and Morning Glories",
-    "year": 2018,
-    "studio": "Zexcs",
-    "eps": 1,
-    "type": "剧场",
-    "tags": [
-      "校园",
-      "直球"
-    ],
-    "score": [
-      7,
-      7,
-      7,
-      9,
-      5
-    ],
-    "summary": "山田与加濑的大学生活前夜。",
-    "verdict": "粉丝向剧场版，延续直球甜度。"
-  },
-  {
-    "id": "asagao",
-    "title": "牵牛花与加濑同学",
-    "en": "Asagao to Kase-san",
-    "year": 2018,
-    "studio": "Zexcs",
-    "eps": 1,
-    "type": "剧场",
-    "tags": [
-      "校园",
-      "直球"
-    ],
-    "score": [
-      7,
-      7,
-      7,
-      9,
-      5
-    ],
-    "summary": "OVA合集加新内容的剧场版。",
-    "verdict": "山田与加濑的甜度不减，直球百合粉丝向。"
-  },
-  {
-    "id": "nettaigyo",
-    "title": "热带鱼是冬天的梦想",
-    "en": "Nettaigyo wa Yami ni Saku",
-    "year": 2019,
-    "studio": "Lerche",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "社团",
-      "慢热",
-      "文学"
-    ],
-    "score": [
-      7,
-      8,
-      7,
-      8,
-      5
-    ],
-    "summary": "水族社的夏深与小雪，别扭而真挚的靠近。",
-    "verdict": "细腻的慢热百合，可惜只有一季。"
+    "summary": "OVA《あさがおと加瀬さん。》：田径部的山田与园艺部的加濑，以牵牛花为契机慢慢靠近的青涩直球校园恋曲。",
+    "verdict": "58分钟但甜度爆炸，直球百合的经典OVA。"
   },
   {
     "id": "rolling-girls",
@@ -3553,8 +3464,8 @@
   },
   {
     "id": "glassy",
-    "title": "玻璃地球?",
-    "en": "Glass no Hana to Kowasu Sekai",
+    "title": "玻璃花与毁坏的世界",
+    "en": "Garakowa: Restore the World",
     "year": 2016,
     "studio": "A-1 Pictures",
     "eps": 1,
@@ -3868,8 +3779,8 @@
   },
   {
     "id": "hana-tsubaki",
-    "title": "花吻在上",
-    "en": "Hana no Kiss",
+    "title": "花吻在上 OVA",
+    "en": "Sono Hanabira ni Kuchizuke wo",
     "year": 2010,
     "studio": "—",
     "eps": 1,
@@ -3887,29 +3798,6 @@
     ],
     "summary": "同人游戏改编的成人百合OVA。",
     "verdict": "成人向，仅作目录收录。"
-  },
-  {
-    "id": "watashi-no-koi",
-    "title": "我和班上最讨厌的女生恋爱了",
-    "en": "Kiraide Isasete",
-    "year": 2025,
-    "studio": "Passione",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "校园",
-      "直球",
-      "恋爱"
-    ],
-    "score": [
-      7,
-      7,
-      7,
-      9,
-      7
-    ],
-    "summary": "最讨厌的同班女生，竟然是最想靠近的人。2025年新番。",
-    "verdict": "直球校园百合，人气新作。"
   },
   {
     "id": "machikado-2",
@@ -3935,50 +3823,8 @@
     "verdict": "夏美子与桃的关系继续升温，搞笑与甜度并存。"
   },
   {
-    "id": "akebi-movie",
-    "title": "明日酱 剧场版",
-    "en": "Akebi-chan Movie",
-    "year": 2023,
-    "studio": "CloverWorks",
-    "eps": 1,
-    "type": "剧场",
-    "tags": [
-      "女校"
-    ],
-    "score": [
-      8,
-      7,
-      8,
-      7,
-      6
-    ],
-    "summary": "明日小路在女校的日常，剧场版。",
-    "verdict": "女校百合氛围延续，画面依然精美。"
-  },
-  {
-    "id": "kunlun",
-    "title": "昆仑之灯",
-    "en": "Kunlun no To",
-    "year": 2024,
-    "studio": "—",
-    "eps": 12,
-    "type": "TV",
-    "tags": [
-      "奇幻"
-    ],
-    "score": [
-      6,
-      6,
-      7,
-      7,
-      5
-    ],
-    "summary": "中国风奇幻百合，2024年动画化。",
-    "verdict": "冷门新作。"
-  },
-  {
     "id": "gokujou",
-    "title": "极上!!めちゃモテ委員長?",
+    "title": "极上生徒会",
     "en": "Gokujou Seitokai",
     "year": 2005,
     "studio": "J.C.STAFF",
@@ -4134,27 +3980,5 @@
     ],
     "summary": "VTuber少女们的直播日常。",
     "verdict": "题材新鲜，轻百合点缀。"
-  },
-  {
-    "id": "whisper-me-movie",
-    "title": "恋语轻唱 剧场版",
-    "en": "Whisper Me a Love Song Movie",
-    "year": 2025,
-    "studio": "Cloud Hearts",
-    "eps": 1,
-    "type": "剧场",
-    "tags": [
-      "乐队",
-      "直球"
-    ],
-    "score": [
-      8,
-      8,
-      8,
-      9,
-      7
-    ],
-    "summary": "依与木乃香的大银幕延续。",
-    "verdict": "TV的延续，直球乐队百合剧场版。"
   }
 ]

@@ -1,68 +1,26 @@
 {
-  "generatedAt": "2026-09-07T09:29:47.754Z",
-  "total": 185,
-  "curatedCount": 185,
-  "autoCount": 0,
+  "generatedAt": "2026-09-02T12:15:19.288Z",
+  "total": 190,
+  "curatedCount": 177,
+  "autoCount": 13,
   "currentSeason": "SUMMER 2026",
   "unmatched": [
     {
-      "id": "sae",
-      "title": "佐伯沙弥香的追忆",
-      "en": "Saeki Sayaka ni Omakase",
-      "bestSim": "0.00"
-    },
-    {
       "id": "madoka-5",
-      "title": "魔法少女小圆 剧场版 起始",
-      "en": "Madoka Movie 1",
-      "bestSim": "0.00"
+      "title": "魔法少女小圆 剧场版 起始的物语",
+      "en": "Puella Magi Madoka Magica the Movie: Beginnings",
+      "bestSim": "0.50"
     },
     {
       "id": "madoka-6",
-      "title": "魔法少女小圆 剧场版 永恒",
-      "en": "Madoka Movie 2",
-      "bestSim": "0.00"
-    },
-    {
-      "id": "yama-ai",
-      "title": "山田与加濑同学",
-      "en": "Yamada to Kase-san",
-      "bestSim": "0.00"
-    },
-    {
-      "id": "nettaigyo",
-      "title": "热带鱼是冬天的梦想",
-      "en": "Nettaigyo wa Yami ni Saku",
-      "bestSim": "0.00"
+      "title": "魔法少女小圆 剧场版 永恒的物语",
+      "en": "Puella Magi Madoka Magica the Movie: Eternal",
+      "bestSim": "0.50"
     },
     {
       "id": "hana-tsubaki",
-      "title": "花吻在上",
-      "en": "Hana no Kiss",
-      "bestSim": "0.00"
-    },
-    {
-      "id": "watashi-no-koi",
-      "title": "我和班上最讨厌的女生恋爱了",
-      "en": "Kiraide Isasete",
-      "bestSim": "0.00"
-    },
-    {
-      "id": "akebi-movie",
-      "title": "明日酱 剧场版",
-      "en": "Akebi-chan Movie",
-      "bestSim": "0.00"
-    },
-    {
-      "id": "kunlun",
-      "title": "昆仑之灯",
-      "en": "Kunlun no To",
-      "bestSim": "0.00"
-    },
-    {
-      "id": "whisper-me-movie",
-      "title": "恋语轻唱 剧场版",
-      "en": "Whisper Me a Love Song Movie",
+      "title": "花吻在上 OVA",
+      "en": "Sono Hanabira ni Kuchizuke wo",
       "bestSim": "0.00"
     }
   ]
