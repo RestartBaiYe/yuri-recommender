@@ -1,27 +1,8 @@
 {
-  "generatedAt": "2026-09-02T12:15:19.288Z",
+  "generatedAt": "2026-09-14T08:31:33.596Z",
   "total": 190,
   "curatedCount": 177,
   "autoCount": 13,
   "currentSeason": "SUMMER 2026",
-  "unmatched": [
-    {
-      "id": "madoka-5",
-      "title": "魔法少女小圆 剧场版 起始的物语",
-      "en": "Puella Magi Madoka Magica the Movie: Beginnings",
-      "bestSim": "0.50"
-    },
-    {
-      "id": "madoka-6",
-      "title": "魔法少女小圆 剧场版 永恒的物语",
-      "en": "Puella Magi Madoka Magica the Movie: Eternal",
-      "bestSim": "0.50"
-    },
-    {
-      "id": "hana-tsubaki",
-      "title": "花吻在上 OVA",
-      "en": "Sono Hanabira ni Kuchizuke wo",
-      "bestSim": "0.00"
-    }
-  ]
+  "unmatched": []
 }
